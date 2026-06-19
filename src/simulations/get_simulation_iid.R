@@ -34,7 +34,7 @@ get_simulation_iid <- function(dataset, num_trees, n_obs, n_sim, kappas, include
             num_trees = num_trees,
             n_obs = n,
             kappas = kappas,
-            include_owrf = TRUE
+            include_owrf = include_owrf
           )
         },
         mc.cores = 1
