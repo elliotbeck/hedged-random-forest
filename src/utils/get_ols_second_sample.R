@@ -3,7 +3,8 @@ source("src/utils/get_ridge_benchmark.R")
 
 library(ranger)
 
-ridge_second_sample <- function(train_data, test_data, num_trees, norm_param) {
+ridge_second_sample <- function(train_data, test_data, num_trees, norm_param,
+                                min_node_size = 5) {
   n      <- nrow(train_data)
   n_half <- floor(n / 2)
 
@@ -16,7 +17,7 @@ ridge_second_sample <- function(train_data, test_data, num_trees, norm_param) {
     num.trees     = num_trees,
     mtry          = floor((ncol(train1) - 1) / 3),
     replace       = TRUE,
-    min.node.size = 5
+    min.node.size = min_node_size
   )
 
   X2     <- predict(rf_model, train2, predict.all = TRUE)$predictions
