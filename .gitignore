@@ -54,3 +54,5 @@ nohup.out
 .vscode/
 
 metadata/benchmark_total.csv
+reviews/
+paper/
