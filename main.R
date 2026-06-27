@@ -24,5 +24,10 @@ mclapply(
   n_obs = n_obs,
   n_sim = n_sim,
   kappas = kappas,
-  include_owrf = FALSE
+  include_wrf = TRUE,
+  include_crf = TRUE,
+  include_ridge = TRUE,
+  include_owrf = FALSE,
+  include_minvar = TRUE,
+  include_ols_second = TRUE
 )
