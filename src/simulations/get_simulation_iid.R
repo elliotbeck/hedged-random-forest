@@ -9,11 +9,20 @@ source("src/cov_estimators/get_cov_qis.R")
 source("src/utils/get_winham_benchmark.R")
 source("src/utils/get_cesaro_benchmark.R")
 source("src/utils/get_owrf_benchmark.R")
+source("src/utils/get_ridge_benchmark.R")
+source("src/utils/get_minvar_benchmark.R")
+source("src/utils/get_ols_second_sample.R")
 source("src/utils/get_performance.R")
 source("src/simulations/run_iteration.R")
 
 # Run simulations per dataset
-get_simulation_iid <- function(dataset, num_trees, n_obs, n_sim, kappas, include_owrf) {
+get_simulation_iid <- function(dataset, num_trees, n_obs, n_sim, kappas,
+                               include_wrf = TRUE,
+                               include_crf = TRUE,
+                               include_ridge = TRUE,
+                               include_owrf = FALSE,
+                               include_minvar = FALSE,
+                               include_ols_second = FALSE) {
   # Load data
   task <- getOMLDataSet(data.id = dataset)
   data <- task$data
@@ -34,7 +43,12 @@ get_simulation_iid <- function(dataset, num_trees, n_obs, n_sim, kappas, include
             num_trees = num_trees,
             n_obs = n,
             kappas = kappas,
-            include_owrf = include_owrf
+            include_wrf = include_wrf,
+            include_crf = include_crf,
+            include_ridge = include_ridge,
+            include_owrf = include_owrf,
+            include_minvar = include_minvar,
+            include_ols_second = include_ols_second
           )
         },
         mc.cores = 1
@@ -46,7 +60,6 @@ get_simulation_iid <- function(dataset, num_trees, n_obs, n_sim, kappas, include
   # Convert nested list to data frame
   results <- lapply(results, function(x) Filter(is.numeric, x))
   results <- data.frame(do.call(rbind, lapply(results, function(x) do.call(rbind, x))))
-  colMeans(results)^0.5
 
   # Get mean results
   results_mean <- aggregate(

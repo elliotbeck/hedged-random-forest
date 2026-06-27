@@ -1,4 +1,10 @@
-run_iteration <- function(n_obs, data, num_trees, kappas, include_owrf) {
+run_iteration <- function(n_obs, data, num_trees, kappas,
+                          include_wrf = TRUE,
+                          include_crf = TRUE,
+                          include_ridge = TRUE,
+                          include_owrf = FALSE,
+                          include_minvar = FALSE,
+                          include_ols_second = FALSE) {
     # Shuffle rows
     data <- data[sample(seq_len(nrow(data))), ]
 
@@ -75,24 +81,39 @@ run_iteration <- function(n_obs, data, num_trees, kappas, include_owrf) {
     names(results_nls) <- paste0("nls_", kappas)
 
     # Get winham et al. benchmark
-    mse_winham <- winham(
-        train_data = train_data,
-        test_data = test_data,
-        rf_model = rf_model,
-        rf_predictions_train_all = rf_predictions_train_all,
-        rf_predictions_test_all = rf_predictions_test_all,
-        norm_param = norm_param
-    )
+    if (include_wrf) {
+        mse_winham <- winham(
+            train_data = train_data,
+            test_data = test_data,
+            rf_model = rf_model,
+            rf_predictions_train_all = rf_predictions_train_all,
+            rf_predictions_test_all = rf_predictions_test_all,
+            norm_param = norm_param
+        )
+    }
 
     # Get cesaro benchmark
-    mse_cesaro <- cesaro(
-        train_data = train_data,
-        test_data = test_data,
-        rf_model = rf_model,
-        rf_predictions_train_all = rf_predictions_train_all,
-        rf_predictions_test_all = rf_predictions_test_all,
-        norm_param = norm_param
-    )
+    if (include_crf) {
+        mse_cesaro <- cesaro(
+            train_data = train_data,
+            test_data = test_data,
+            rf_model = rf_model,
+            rf_predictions_train_all = rf_predictions_train_all,
+            rf_predictions_test_all = rf_predictions_test_all,
+            norm_param = norm_param
+        )
+    }
+
+    # Get ridge benchmark
+    if (include_ridge) {
+        mse_ridge <- ridge(
+            rf_predictions_train_all = rf_predictions_train_all,
+            train_data = train_data,
+            rf_predictions_test_all = rf_predictions_test_all,
+            test_data = test_data,
+            norm_param = norm_param
+        )
+    }
 
     # Get owrf benchmark
     if (include_owrf) {
@@ -106,18 +127,56 @@ run_iteration <- function(n_obs, data, num_trees, kappas, include_owrf) {
         )
     }
 
+    # Get minimum variance portfolio benchmarks (variance-only objective, bias-corrected)
+    if (include_minvar) {
+        results_minvar_sample <- sapply(
+            kappas,
+            minvar,
+            mean_vector = mean_vector,
+            cov_matrix = cov_matrix,
+            predictions_test = rf_predictions_test_all,
+            labels_test = test_data$target,
+            mean = norm_param$mean,
+            sd = norm_param$sd
+        )
+        names(results_minvar_sample) <- paste0("minvar_sample_", kappas)
+
+        results_minvar_nls <- sapply(
+            kappas,
+            minvar,
+            mean_vector = mean_vector,
+            cov_matrix = cov_matrix_shrinkage,
+            predictions_test = rf_predictions_test_all,
+            labels_test = test_data$target,
+            mean = norm_param$mean,
+            sd = norm_param$sd
+        )
+        names(results_minvar_nls) <- paste0("minvar_nls_", kappas)
+    }
+
+    # Get second-sample OLS benchmark (Timmermann 2006)
+    if (include_ols_second) {
+        mse_ols_second <- ols_second_sample(
+            train_data = train_data,
+            test_data = test_data,
+            num_trees = num_trees,
+            norm_param = norm_param
+        )
+    }
+
     # Bind results
     results <- c(
         n_obs = n_obs,
         rf = mse(rf_predictions, test_data$target),
-        wrf = mse_winham,
-        crf = mse_cesaro,
         results_sample,
         results_nls
     )
-    if (include_owrf) {
-        results <- c(results, owrf = mse_owrf)
-    }
+    if (include_wrf)        results <- c(results, wrf        = mse_winham)
+    if (include_crf)        results <- c(results, crf        = mse_cesaro)
+    if (include_ridge)      results <- c(results, ridge      = mse_ridge)
+    if (include_owrf)       results <- c(results, owrf       = mse_owrf)
+    if (include_minvar)     results <- c(results, results_minvar_sample, results_minvar_nls)
+    if (include_ols_second) results <- c(results, ols_second = mse_ols_second)
 
     #  Store results
     return(results)
