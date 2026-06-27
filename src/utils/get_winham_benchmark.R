@@ -4,7 +4,8 @@ winham <- function(train_data,
                    rf_model,
                    norm_param,
                    rf_predictions_train_all,
-                   rf_predictions_test_all) {
+                   rf_predictions_test_all,
+                   return_preds = FALSE) {
   inbcs <- do.call(cbind, rf_model$inbag.counts)
   rf_predictions_train_all[which(inbcs > 0)] <- NA
   weights_unnormalized <- colMeans(
@@ -14,6 +15,7 @@ winham <- function(train_data,
   weights <- (exp(1 / weights_unnormalized) / sum(exp(1 / weights_unnormalized)))
   preds_winham <- rf_predictions_test_all %*% weights
   preds_winham <- (preds_winham * norm_param$sd) + norm_param$mean
+  if (return_preds) return(drop(preds_winham))
   mse_winham <- mse(preds_winham, test_data$target)
   return(mse_winham)
 }

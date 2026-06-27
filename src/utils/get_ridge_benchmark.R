@@ -41,12 +41,14 @@ ridge <- function(rf_predictions_train_all,
                   train_data,
                   rf_predictions_test_all,
                   test_data,
-                  norm_param) {
+                  norm_param,
+                  return_preds = FALSE) {
   preds <- constrained_ridge(
     X_train = rf_predictions_train_all,
     y_train = train_data$target,
     X_test  = rf_predictions_test_all
   )
   preds <- (preds * norm_param$sd) + norm_param$mean
+  if (return_preds) return(drop(preds))
   mse(preds, test_data$target)
 }

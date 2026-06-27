@@ -4,7 +4,8 @@ cesaro <- function(train_data,
                    rf_model,
                    norm_param,
                    rf_predictions_train_all,
-                   rf_predictions_test_all) {
+                   rf_predictions_test_all,
+                   return_preds = FALSE) {
   inbcs <- do.call(cbind, rf_model$inbag.counts)
   rf_predictions_train_all[which(inbcs > 0)] <- NA
   weights_unnormalized <- colMeans(
@@ -20,6 +21,7 @@ cesaro <- function(train_data,
   weights <- weights / sum(weights)
   preds_cesaro <- rf_predictions_test_all %*% weights
   preds_cesaro <- (preds_cesaro * norm_param$sd) + norm_param$mean
+  if (return_preds) return(drop(preds_cesaro))
   mse_cesaro <- mse(preds_cesaro, test_data$target)
   return(mse_cesaro)
 }
