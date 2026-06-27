@@ -255,13 +255,16 @@ results_ratios_rf$winham <- results_ratios_rf$nls_2 /
   results_ratios_rf$wrf
 results_ratios_rf$cesaro <- results_ratios_rf$nls_2 /
   results_ratios_rf$crf
+results_ratios_rf$ridge_ratio <- results_ratios_rf$nls_2 /
+  results_ratios_rf$ridge
 
 #  Convert to long format
 results_ratios_rf_long <- melt(
   results_ratios_rf,
   measure.vars = c(
     "winham",
-    "cesaro"
+    "cesaro",
+    "ridge_ratio"
   ),
   id.vars = c("dataset", "n_obs"),
 )
@@ -281,7 +284,7 @@ plot <- ggplot(
   theme(legend.position = "none") +
   labs(x = NULL, y = NULL) +
   theme(axis.text.x = element_blank()) +
-  scale_fill_manual(values = c("#00B9E3", "#619CFF")) +
+  scale_fill_manual(values = c("#00B9E3", "#619CFF", "#F8766D")) +
   geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
   scale_y_continuous(
     limits = c(0.8, 1.1),
@@ -310,9 +313,9 @@ for (n_obs in unique(results_rmse$n_obs)) {
     order(results_rmse_subset$dataset_name),
   ]
   results_rmse_subset <- results_rmse_subset[
-    c("dataset_name", "rf", "nls_2", "wrf", "crf")
+    c("dataset_name", "rf", "nls_2", "wrf", "crf", "ridge")
   ]
-  colnames(results_rmse_subset) <- c("Name", "RF", "HRF", "WRF", "CRF")
+  colnames(results_rmse_subset) <- c("Name", "RF", "HRF", "WRF", "CRF", "Ridge")
   results_rmse_subset[
     results_rmse_subset$Name %in% c("Ailerons", "elevators"), 2:ncol(results_rmse_subset)
   ] <- results_rmse_subset[
