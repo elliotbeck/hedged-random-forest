@@ -154,9 +154,9 @@ run_iteration <- function(n_obs, data, num_trees, kappas,
         names(results_minvar_nls) <- paste0("minvar_nls_", kappas)
     }
 
-    # Get second-sample OLS benchmark (Timmermann 2006)
+    # Get second-sample ridge benchmark (Timmermann 2006)
     if (include_ols_second) {
-        mse_ols_second <- ols_second_sample(
+        mse_ols_second <- ridge_second_sample(
             train_data = train_data,
             test_data = test_data,
             num_trees = num_trees,
@@ -176,7 +176,7 @@ run_iteration <- function(n_obs, data, num_trees, kappas,
     if (include_ridge)      results <- c(results, ridge      = mse_ridge)
     if (include_owrf)       results <- c(results, owrf       = mse_owrf)
     if (include_minvar)     results <- c(results, results_minvar_sample, results_minvar_nls)
-    if (include_ols_second) results <- c(results, ols_second = mse_ols_second)
+    if (include_ols_second) results <- c(results, ridge_second = mse_ols_second)
 
     #  Store results
     return(results)
