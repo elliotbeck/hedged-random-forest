@@ -27,7 +27,7 @@ run_iteration <- function(n_obs, data, num_trees, kappas,
         mtry = floor((ncol(train_data) - 1) / 3),
         replace = TRUE,
         keep.inbag = TRUE,
-        min.node.size = if (include_owrf) floor(sqrt(nrow(train_data))) else 5
+        min.node.size = 5
     )
 
     # Tuned random forest predictions on test data
@@ -156,7 +156,7 @@ run_iteration <- function(n_obs, data, num_trees, kappas,
 
     # Get second-sample ridge benchmark (Timmermann 2006)
     if (include_ols_second) {
-        mse_ols_second <- ridge_second_sample(
+        mse_ols_second <- get_ridge_second_sample(
             train_data = train_data,
             test_data = test_data,
             num_trees = num_trees,

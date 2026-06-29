@@ -6,7 +6,7 @@ source("src/utils/get_winham_benchmark.R")
 source("src/utils/get_cesaro_benchmark.R")
 source("src/utils/get_owrf_benchmark.R")
 source("src/utils/get_ridge_benchmark.R")
-source("src/utils/get_ols_second_sample.R")
+source("src/utils/get_ridge_second_sample.R")
 source("src/simulations/run_iteration_owrf.R")
 
 library(ranger)
@@ -69,7 +69,7 @@ load_owrf_dataset <- function(cfg, data_dir = "data/owrf") {
 
 # Run n_sim iterations for one dataset and return averaged MSFE/MAFE.
 get_simulation_owrf <- function(dataset_name, cfg, n_sim = 1000,
-                                num_trees = 100, kappas = c(1, 2),
+                                num_trees = 500, kappas = c(1, 2),
                                 data_dir  = "data/owrf",
                                 include_owrf     = TRUE,
                                 include_ridge    = TRUE,

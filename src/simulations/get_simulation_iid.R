@@ -11,7 +11,7 @@ source("src/utils/get_cesaro_benchmark.R")
 source("src/utils/get_owrf_benchmark.R")
 source("src/utils/get_ridge_benchmark.R")
 source("src/utils/get_minvar_benchmark.R")
-source("src/utils/get_ols_second_sample.R")
+source("src/utils/get_ridge_second_sample.R")
 source("src/utils/get_performance.R")
 source("src/simulations/run_iteration.R")
 
@@ -70,10 +70,11 @@ get_simulation_iid <- function(dataset, num_trees, n_obs, n_sim, kappas,
   colnames(results_mean)[1] <- "n_obs"
 
   # Save results
+  dir.create("results/iid", showWarnings = FALSE, recursive = TRUE)
   save(results, file = paste0(
-    "results/weighted_rf_", dataset, ".RData"
+    "results/iid/weighted_rf_", dataset, ".RData"
   ))
   save(results_mean, file = paste0(
-    "results/weighted_rf_mean_", dataset, ".RData"
+    "results/iid/weighted_rf_mean_", dataset, ".RData"
   ))
 }

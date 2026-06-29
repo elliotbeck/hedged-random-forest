@@ -3,7 +3,7 @@ source("src/utils/get_ridge_benchmark.R")
 
 library(ranger)
 
-ridge_second_sample <- function(train_data, test_data, num_trees, norm_param,
+get_ridge_second_sample <- function(train_data, test_data, num_trees, norm_param,
                                 min_node_size = 5) {
   n      <- nrow(train_data)
   n_half <- floor(n / 2)
