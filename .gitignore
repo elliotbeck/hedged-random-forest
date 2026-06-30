@@ -38,8 +38,6 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-# Ignore data path
-data/
 
 # Ignore linter option
 .lintr
