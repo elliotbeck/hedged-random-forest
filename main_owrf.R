@@ -1,8 +1,9 @@
 source("src/simulations/get_simulation_owrf.R")
+library(parallel)
 
 # ── Parameters ───────────────────────────────────────────────────────────────
 N_SIM     <- 1000     # set to 10 for quick experiment
-NUM_TREES <- 100
+NUM_TREES <- 500
 KAPPAS    <- c(1, 2)
 DATA_DIR  <- "data/owrf"
 OUT_DIR   <- "results/owrf"
@@ -10,7 +11,7 @@ OUT_DIR   <- "results/owrf"
 dir.create(OUT_DIR, recursive = TRUE, showWarnings = FALSE)
 
 # ── Run all 12 datasets ───────────────────────────────────────────────────────
-all_results <- lapply(names(owrf_dataset_configs), function(nm) {
+all_results <- mclapply(names(owrf_dataset_configs), function(nm) {
   get_simulation_owrf(
     dataset_name     = nm,
     cfg              = owrf_dataset_configs[[nm]],
@@ -22,7 +23,7 @@ all_results <- lapply(names(owrf_dataset_configs), function(nm) {
     include_ridge    = TRUE,
     include_ridge2nd = TRUE
   )
-})
+}, mc.cores = 12L)
 names(all_results) <- names(owrf_dataset_configs)
 
 saveRDS(all_results, file.path(OUT_DIR, "owrf_results.rds"))

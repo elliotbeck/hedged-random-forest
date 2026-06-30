@@ -19,7 +19,6 @@ run_iteration_owrf <- function(data, num_trees = 100, kappas = c(1, 2),
   y_test <- test_data$target
 
   # RF: Chen et al. settings — 100 trees, min.node.size = floor(sqrt(n_train))
-  min_node <- floor(sqrt(n_train))
   rf_model <- ranger::ranger(
     target ~ .,
     data          = train_data,
@@ -27,7 +26,7 @@ run_iteration_owrf <- function(data, num_trees = 100, kappas = c(1, 2),
     mtry          = floor((ncol(train_data) - 1) / 3),
     replace       = TRUE,
     keep.inbag    = TRUE,
-    min.node.size = min_node
+    min.node.size = 5
   )
 
   rf_preds <- (predict(rf_model, test_data)$predictions * norm_param$sd) + norm_param$mean
@@ -105,7 +104,7 @@ run_iteration_owrf <- function(data, num_trees = 100, kappas = c(1, 2),
       num.trees     = num_trees,
       mtry          = floor((ncol(train1) - 1) / 3),
       replace       = TRUE,
-      min.node.size = floor(sqrt(n_half))
+      min.node.size = 5
     )
     X2     <- predict(rf2, train2, predict.all = TRUE)$predictions
     X_tst2 <- predict(rf2, test_data, predict.all = TRUE)$predictions
