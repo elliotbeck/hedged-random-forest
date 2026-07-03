@@ -1,0 +1,263 @@
+\begin{thebibliography}{}
+
+\bibitem[Athey and Imbens, 2016]{athey:imbens:2016}
+Athey, S. and Imbens, G.~W. (2016).
+\newblock Recursive partitioning for heterogeneous causal effects.
+\newblock {\em Proceedings of the National Academy of Sciences},
+  113(27):7353--7360.
+
+\bibitem[Athey and Imbens, 2019]{athey:imbens:ml:2019}
+Athey, S. and Imbens, G.~W. (2019).
+\newblock Machine learning methods that economists should know about.
+\newblock {\em Annual Review of Economics}, 11(1):685--725.
+
+\bibitem[Athey et~al., 2019]{athey:tibshirani:wager:2019}
+Athey, S., Tibshirani, J., and Wager, S. (2019).
+\newblock Generalized random forests.
+\newblock {\em Annals of Statistics}, 471(2):1148--1178.
+
+\bibitem[Beck and Wolf, 2025]{beck:wolf:hrf-inf}
+Beck, E. and Wolf, M. (2025).
+\newblock Forecasting inflation with the hedged random forest.
+\newblock Working paper, University of Zurich.
+\newblock Available at SSRN: {\tt https://ssrn.com/abstract=5162541}.
+
+\bibitem[Belloni et~al., 2012]{BellChenChernHans:nonGauss}
+Belloni, A., Chen, D.~L., Chernozhukov, V., and Hansen, C.~B. (2012).
+\newblock Sparse models and methods for optimal instruments with an application
+  to eminent domain.
+\newblock {\em Econometrica}, 80(6):2369--2429.
+\newblock Arxiv, 2010.
+
+\bibitem[Belloni et~al., 2014]{BelloniChernozhukovHansen2011}
+Belloni, A., Chernozhukov, V., and Hansen, C. (2014).
+\newblock Inference on treatment effects after selection amongst
+  high-dimensional controls.
+\newblock {\em Review of Economic Studies}, 81(2):608--650.
+
+\bibitem[Bergmeir and Ben{\'\i}tez, 2012]{bergmeir:benitez:2012}
+Bergmeir, C. and Ben{\'\i}tez, J.~M. (2012).
+\newblock On the use of cross-validation for time series predictor evaluation.
+\newblock {\em Information Sciences}, 191:192--213.
+
+\bibitem[Bergmeir et~al., 2018]{bergmeir:hyndman:koo:2018}
+Bergmeir, C., Hyndman, R.~J., and Koo, B. (2018).
+\newblock A note on the validity of cross-validation for evaluating
+  autoregressive time series prediction.
+\newblock {\em Computational Statistics \& Data Analysis}, 120:70--83.
+
+\bibitem[Bodnar et~al., 2019]{bodnar:okhrin:parolya:2019}
+Bodnar, T., Okhrin, O., and Parolya, N. (2019).
+\newblock Optimal shrinkage estimator for high-dimensional mean vector.
+\newblock {\em Journal of Multivariate Analysis}, 170:63--79.
+
+\bibitem[Breiman, 2001]{breiman:2001}
+Breiman, L. (2001).
+\newblock Random forests.
+\newblock {\em Machine Learning}, 45:5--32.
+
+\bibitem[Chan and \mbox{M{\'a}ty{\'a}s}, 2022]{chan:ml:2022}
+Chan, F. and \mbox{M{\'a}ty{\'a}s}, L. (2022).
+\newblock {\em Econometrics With Machine Learning}.
+\newblock Springer, Chan (Switzerland).
+
+\bibitem[Chen et~al., 2024]{chen:yu:zhang:2024}
+Chen, X., Yu, D., and Zhang, X. (2024).
+\newblock Optimal weighted random forests.
+\newblock {\em Journal of Machine Learning Research}, 25(320):1--81.
+
+\bibitem[Chernozhukov et~al., 2018]{chernozhukov2018}
+Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey,
+  W., and Robins, J. (2018).
+\newblock Double/debiased machine learning for treatment and structural
+  parameters.
+\newblock {\em The Econometrics Journal}, 21(1):C1--C68.
+
+\bibitem[{DeMiguel} et~al., 2009]{demiguel:ms:2009}
+{DeMiguel}, V., Garlappi, L., Nogales, F.~J., and Uppal, R. (2009).
+\newblock A generalized approach to portfolio optimization: {Improving}
+  performance by constraining portfolio norms.
+\newblock {\em Management Science}, 55(5):798--812.
+
+\bibitem[Ding and Zheng, 2025]{ding:zheng:2025}
+Ding, Y. and Zheng, X. (2025).
+\newblock Sub-{G}aussian estimation of the scatter matrix in ultra-high
+  dimensional elliptical factor models with $2+\epsilon$th moment.
+\newblock Reearch Paper 2025-200, HKUST Business School.
+\newblock Available at {\tt https://ssrn.com/abstract=5143723}.
+
+\bibitem[Dixon et~al., 2020]{dixon:halperin:bilokon:2020}
+Dixon, M.~F., Halperin, I., and Bilokon, P. (2020).
+\newblock {\em Machine Learning in Finance}, volume 1170.
+\newblock Springer International Publishing, New York.
+
+\bibitem[Efron and Hastie, 2022]{efron:hastie:2016}
+Efron, B. and Hastie, T. (2022).
+\newblock {\em Computer Age Statistical Inference}.
+\newblock Cambridge University Press, Cambridge.
+
+\bibitem[Elliott and Timmermann, 2016]{elliott:timmermann:2016}
+Elliott, G. and Timmermann, A. (2016).
+\newblock {\em Economic Forecasting}.
+\newblock Princeton University Press, Princeton.
+
+\bibitem[Engle et~al., 2019]{engle:ledoit:wolf:2019}
+Engle, R.~F., Ledoit, O., and Wolf, M. (2019).
+\newblock Large dynamic covariance matrices.
+\newblock {\em Journal of Business \& Economic Statistics}, 37(2):363--375.
+
+\bibitem[Gammerman and Vovk, 2007]{gammerman:vovk:2007}
+Gammerman, A. and Vovk, V. (2007).
+\newblock Hedging predictions in machine learning.
+\newblock {\em Computer Journal}, 50(2):151--163.
+
+\bibitem[Grinsztajn et~al., 2022]{grinsztajn:2022}
+Grinsztajn, L., Oyallon, E., and Varoquaux, G. (2022).
+\newblock Why do tree-based models still outperform deep learning on typical
+  tabular data?
+\newblock In {\em Thirty-sixth Conference on Neural Information Processing
+  Systems Datasets and Benchmarks Track}.
+
+\bibitem[Hansen, 2016]{hansen:2016}
+Hansen, B.~E. (2016).
+\newblock The risk of {J}ames-{S}tein and {L}asso shrinkage.
+\newblock {\em Econometric Reviews}, 35(8-10):1456--1470.
+
+\bibitem[Hansen and Kozbur, 2014]{hansenkobzur}
+Hansen, C. and Kozbur, D. (2014).
+\newblock Instrumental variables estimation with many weak instruments using
+  regularized {JIVE}.
+\newblock {\em Journal of Econometrics}, 182(2):290--308.
+
+\bibitem[Hansen et~al., 2023]{hansen:kozbur:misra}
+Hansen, C., Kozbur, D., and Misra, S. (2023).
+\newblock Targeted undersmoothing: Sensitivity analysis for sparse estimators.
+\newblock {\em The Review of Economics and Statistics}, 105(1):101--112.
+
+\bibitem[Hansen and Timmermann, 2015]{hansen:timmermann:2015}
+Hansen, P.~R. and Timmermann, A. (2015).
+\newblock Equivalence between out-of-sample forecast comparisons and {W}ald
+  statistics.
+\newblock {\em Econometrica}, 83(6):2485--2505.
+
+\bibitem[Hastie et~al., 2017]{hastie:tibshirani:freedman:2017}
+Hastie, T., Tibshirani, R., and Freedman, J. (2017).
+\newblock {\em The Elements of Statistical Learning}.
+\newblock Springer, New York, second edition.
+
+\bibitem[Hayashi, 2000]{hayashi:2000}
+Hayashi, F. (2000).
+\newblock {\em Econometrics}.
+\newblock Princeton University Press, Princeton, New Jersey.
+
+\bibitem[Jagannathan and Ma, 2003]{jagannathan:ma:2003}
+Jagannathan, R. and Ma, T. (2003).
+\newblock Risk reduction in large portfolios: Why imposing the wrong
+  constraints helps.
+\newblock {\em Journal of Finance}, 54(4):1651--1684.
+
+\bibitem[Januschowski et~al., 2022]{januschowski2022forecasting}
+Januschowski, T., Wang, Y., Torkkola, K., Erkkil{\"a}, T., Hasson, H., and
+  Gasthaus, J. (2022).
+\newblock Forecasting with trees.
+\newblock {\em International Journal of Forecasting}, 38(4):1473--1481.
+
+\bibitem[Jobson and Korkie, 1980]{jobson:korkie:1980}
+Jobson, J.~D. and Korkie, B.~M. (1980).
+\newblock Estimation for {M}arkowitz efficient portfolios.
+\newblock {\em Journal of the American Statistical Association}, 75:544--554.
+
+\bibitem[Kelly and Xiu, 2023]{kellly:xiu:2023}
+Kelly, B. and Xiu, D. (2023).
+\newblock Financial machine learning.
+\newblock {\em Foundations and Trends{\textregistered} in Finance},
+  13(3--4):205--363.
+
+\bibitem[Ledoit and Wolf, 2021]{ledoit:wolf:2021}
+Ledoit, O. and Wolf, M. (2021).
+\newblock Shrinkage estimation of large covariance matrices: Keep it simple,
+  statistician?
+\newblock {\em Journal of Multivariate Analysis}, 186:104796.
+
+\bibitem[Ledoit and Wolf, 2022a]{ledoit:wolf:power}
+Ledoit, O. and Wolf, M. (2022a).
+\newblock The power of (non-)linear shrinking: {A} review and guide to
+  covariance matrix estimation.
+\newblock {\em Journal of Financial Econometrics}, 20(1):187--218.
+
+\bibitem[Ledoit and Wolf, 2022b]{ledoit:wolf:2022}
+Ledoit, O. and Wolf, M. (2022b).
+\newblock Quadratic shrinkage for large covariance matrices.
+\newblock {\em Bernoulli}, 28(3):1519--1547.
+
+\bibitem[Liaw and Wiener, 2002]{random:forest:2002}
+Liaw, A. and Wiener, M. (2002).
+\newblock Classification and regression by randomforest.
+\newblock {\em R News}, 2(3):18--22.
+
+\bibitem[L{\'o}pez~de Prado, 2020]{lopez:ml:book}
+L{\'o}pez~de Prado, M.~M. (2020).
+\newblock {\em Machine Learning for Asset Aanagers}.
+\newblock Cambridge University Press, Cambridge.
+
+\bibitem[Michaud, 1989]{michaud:1989}
+Michaud, R. (1989).
+\newblock The {M}arkowitz optimization enigma: Is optimized optimal?
+\newblock {\em Financial Analysts Journal}, 45:31--42.
+
+\bibitem[Mullainathan and Spiess, 2017]{Sendhil:MLAppliedMetrics}
+Mullainathan, S. and Spiess, J. (2017).
+\newblock Machine learning: An applied econometric approach.
+\newblock {\em Journal of Economic Perspectives}, 31(2):87--106.
+
+\bibitem[Pham and Olafsson, 2020]{pham:2020}
+Pham, H. and Olafsson, S. (2020).
+\newblock On {C}esáro averages for weighted trees in the random forest.
+\newblock {\em Journal of Classification}, 37(1):223--236.
+
+\bibitem[Qiu et~al., 2020]{qiu:xie:zhang:2020}
+Qiu, Y., Xie, T., Yu, J., and Zhang, X. (2020).
+\newblock Mallows-type averaging machine learning techniques.
+\newblock Working paper, Singapore Management University.
+
+\bibitem[Sancetta, 2008]{sancetta:2008}
+Sancetta, A. (2008).
+\newblock Sample covariance shrinkage for high dimensional dependent data.
+\newblock {\em Journal of Multivariate Analysis}, 99(5):949--967.
+
+\bibitem[Timmermann, 2006]{timmermann:2006}
+Timmermann, A. (2006).
+\newblock Forecast combinations.
+\newblock In Elliott, G., Granger, C. W.~J., and Timmermann, A., editors, {\em
+  Handbook of Economic Forecasting}, pages 135--196. North Holland, Amsterdam.
+
+\bibitem[Varian, 2014]{varian2014big}
+Varian, H.~R. (2014).
+\newblock Big data: New tricks for econometrics.
+\newblock {\em Journal of Economic Perspectives}, 28(2):3--28.
+
+\bibitem[Wager and Athey, 2018]{wager:athey:2018}
+Wager, S. and Athey, S. (2018).
+\newblock Estimation and inference of heterogeneous treatment effects using
+  random forests.
+\newblock {\em Journal of the American Statistical Association},
+  113(523):1228--1242.
+
+\bibitem[Wang et~al., 2022]{wang:hyndman:li:Kang:2022}
+Wang, X., Hyndman, R.~J., Li, F., and Kang, Y. (2022).
+\newblock Forecast combinations: {A}n over 50-year review.
+\newblock {\em International Journal of Forecasting}.
+
+\bibitem[Winham et~al., 2013]{winham:2013}
+Winham, S.~J., Freimuth, R.~R., and Biernacka, J.~M. (2013).
+\newblock A weighted random forests approach to improve predictive performance.
+\newblock {\em Statistical Analysis and Data Mining: The ASA Data Science
+  Journal}, 6(6):496--505.
+
+\bibitem[Wright and Ziegler, 2017]{ranger:2017}
+Wright, M.~N. and Ziegler, A. (2017).
+\newblock {ranger}: A fast implementation of random forests for high
+  dimensional data in {C++} and {R}.
+\newblock {\em Journal of Statistical Software}, 77(1):1--17.
+
+\end{thebibliography}

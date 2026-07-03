@@ -42,9 +42,6 @@ vignettes/*.pdf
 # Ignore linter option
 .lintr
 
-# Ignore results folder
-results/
-
 # Ignore cluster output
 nohup.out
 
@@ -53,4 +50,3 @@ nohup.out
 
 metadata/benchmark_total.csv
 reviews/
-paper/

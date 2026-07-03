@@ -1,0 +1,284 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage{enumitem}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{xr}
+\externaldocument{hrf}
+
+% Referee comment box
+\newmdenv[
+  linecolor=gray!50,
+  backgroundcolor=gray!8,
+  innerleftmargin=10pt,
+  innerrightmargin=10pt,
+  innertopmargin=8pt,
+  innerbottommargin=8pt,
+  skipabove=10pt,
+  skipbelow=4pt
+]{refbox}
+
+\newcommand{\comment}[1]{\begin{refbox}\textit{#1}\end{refbox}}
+\newcommand{\response}{\medskip\noindent\textbf{Response.}\ }
+\newcommand{\hrf}{\textsc{hrf}}
+\newcommand{\rf}{\textsc{rf}}
+
+\title{Response to Referee Report\\[6pt]
+  \large ``Hedged Random Forest''\\
+  \normalsize Journal of Financial Econometrics --- JFEC-2025-167}
+\author{E.\ Beck \and D.\ Kozbur \and M.\ Wolf}
+\date{}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+We thank the referee for the careful reading and constructive suggestions.
+The report has led to meaningful improvements in the paper.
+Below we address each point in turn.
+All section, equation, and table references are to the revised manuscript.
+
+% ============================================================
+\section*{Main Comments}
+% ============================================================
+
+% -----------------------------------------------------------
+\subsection*{Comment 1}
+% -----------------------------------------------------------
+
+\comment{Why not carry out estimation on a second sample using standard OLS
+with constraints on the weights, which is also a standard approach
+(Timmermann, 2006)?  Ridge would require to tune a parameter, but this
+could be done by AIC, though ad hoc.  Of course, this is a different
+estimator, but a reader may want to understand the distinction and whether
+one approach is better than the other.}
+
+\response
+We have implemented a second-sample benchmark in the spirit of
+\citet{timmermann:2006}.
+The approach splits the training data in half: the random forest is trained
+on the first half, and the tree-level weights are estimated on the second
+half (which the trees have never seen).
+
+A pure OLS estimator on the second sample is not viable here because the
+number of trees ($B = 500$) far exceeds the second-sample size ($n/2$),
+making the system severely underdetermined.
+Ridge regression with a sum-to-one constraint handles the high-dimensional
+regime gracefully; we select the penalty parameter $\lambda$ by AIC using
+the analytical hat-matrix trace for the equality-constrained problem.
+We refer to this estimator as \textit{Ridge\textsubscript{2nd}}.
+
+% TODO: add forward reference to new table/figure once results are finalised.
+The empirical results are reported in [TABLE/FIGURE REF].
+[RESULTS DISCUSSION PENDING --- fill in once final experiment is complete.]
+
+% -----------------------------------------------------------
+\subsection*{Comment 2}
+% -----------------------------------------------------------
+
+\comment{Why not carrying out estimation on the same sample using a ridge
+regression?  Again, helping the reader see the distinction and the merits
+of one method over the other could be useful.}
+
+\response
+We have added a same-sample ridge regression benchmark (Ridge).
+As with the second-sample variant, we impose the sum-to-one constraint and
+select $\lambda$ by AIC.
+Because the constraint is an equality, the standard ridge hat matrix must be
+corrected; we derive the exact effective degrees of freedom analytically via
+the economy SVD of the tree-prediction matrix.
+
+% TODO: add forward reference to new table/figure once results are finalised.
+The results are reported alongside the other benchmarks in [TABLE/FIGURE
+REF].
+[RESULTS DISCUSSION PENDING --- fill in once final experiment is complete.]
+
+% -----------------------------------------------------------
+\subsection*{Comment 3}
+% -----------------------------------------------------------
+
+\comment{Why not focusing on variance minimisation, as for a minimum variance
+portfolio?  Once the weights are derived this way and fixed, the bias, which
+is a constant, could be removed in a second step, when forecasting.}
+
+\response
+We have implemented the minimum variance (MV) portfolio as an additional
+benchmark.
+The weights are obtained by minimising $\mathbf{w}^{\top}\widehat{\boldsymbol{\Sigma}}\mathbf{w}$
+subject to $\mathbf{1}^{\top}\mathbf{w}=1$ and the leverage constraint
+$\|\mathbf{w}\|_1\leq\kappa$, with $\kappa\in\{1,2\}$.
+The systematic bias of the combined predictor,
+$\hat{b} = \mathbf{w}^{\top}\bar{\mathbf{r}}$ where $\bar{\mathbf{r}}$
+denotes the vector of mean training residuals, is then subtracted from each
+test prediction.
+We implement both the sample and the shrunk (Ledoit--Wolf NLS) covariance
+variants, mirroring the \hrf\ design.
+
+% TODO: add forward reference to new table/figure once results are finalised.
+The results are reported in [TABLE/FIGURE REF] and discussed in
+Comment~4 below.
+
+% -----------------------------------------------------------
+\subsection*{Comment 4}
+% -----------------------------------------------------------
+
+\comment{Individual trees tend to have low bias but high variance, so the
+variance component may dominate in practice.  This justifies the use of the
+sample mean for the estimator of the bias of the individual trees, i.e.\ they
+are small numbers close to zero dominated by the variance.  Would the
+estimator perform the same or perhaps better if we just used a minimum
+variance portfolio approach and forgot about the bias?}
+
+\response
+The empirical results for the MV benchmark described in Comment~3 provide a
+direct answer.
+Across all datasets and sample sizes, the performance of
+MV (shrunk, $\kappa=2$) and \hrf\ (shrunk, $\kappa=2$) is virtually
+identical, confirming the referee's intuition that the bias term in the joint
+objective contributes little in practice.
+Individual tree biases are indeed small relative to the variance, so the
+\hrf\ objective is effectively dominated by the variance component.
+
+This finding is informative in two directions.
+First, it validates the \hrf\ design: the method works well even though the
+bias estimation step is noisy, because the variance component is what matters.
+Second, it provides a useful robustness check for practitioners: a
+pure variance-minimisation approach with a post-hoc bias correction is
+equally effective and even simpler to implement.
+
+% TODO: reference the specific numbers from the final table.
+
+% -----------------------------------------------------------
+\subsection*{Comment 5}
+% -----------------------------------------------------------
+
+\comment{What is very interesting about negative weights is that they should
+work better in situations where the trees are correlated.  From portfolio
+optimisation theory we know that the weights will be all positive if the
+correlations of the trees were small.  However, negative weights become more
+likely as correlations increase.  Hence, the authors' method becomes even
+more important and relevant when features are correlated, making tree
+decorrelation more difficult.  I think remarking on the properties of
+portfolio weights (especially in light of Point 4) as a function of
+correlations would be relevant.}
+
+\response
+We thank the referee for this insightful observation, which we now make
+explicit in the paper (Section~\ref*{sec:neg-weights}).
+
+The connection follows directly from classical results in portfolio theory.
+When the trees are mutually uncorrelated, the minimum-variance weights are
+all positive: there is no benefit to short positions because each tree
+contributes independent variance reduction.
+As pairwise tree correlations increase, the optimal portfolio can reduce
+variance further by going short on the most ``redundant'' trees, using
+their predictions to cancel noise shared with other trees.
+The leverage constraint $\|\mathbf{w}\|_1 \leq \kappa$ controls the degree
+to which this is permitted: $\kappa = 1$ restricts weights to be non-negative
+(no short-selling), while $\kappa = 2$ allows negative weights.
+
+In the random forest setting this has a natural interpretation.
+Trees are constructed to be decorrelated via feature subsampling
+(the \texttt{mtry} parameter), but this decorrelation is imperfect when
+the input features are themselves highly correlated.
+In such datasets the trees remain substantially correlated, and the gains
+from $\kappa = 2$ over $\kappa = 1$ are expected to be largest.
+Conversely, when features are nearly independent, trees are already
+well-decorrelated, $\kappa = 1$ suffices, and the additional flexibility of
+$\kappa = 2$ adds little.
+This provides a characterisation of when \hrf\ with negative weights is most
+valuable, and it is consistent with the empirical patterns we observe across
+the benchmark datasets.
+The corresponding passage has been added to Section~\ref*{sec:neg-weights}
+of the revised manuscript.
+
+% ============================================================
+\section*{Additional Comments}
+% ============================================================
+
+% -----------------------------------------------------------
+\subsection*{Additional Comment 1}
+% -----------------------------------------------------------
+
+\comment{It would be interesting to know whether one can learn something about
+the methodology and the HRF estimator from the individual characteristics of
+the datasets (e.g., variable correlations, fat-tailed data etc.).  For
+instance, are there certain data features that systematically relate to larger
+performance gains?}
+
+\response
+% TODO: Run dataset characteristics analysis and summarise findings here.
+[RESPONSE PENDING]
+
+% -----------------------------------------------------------
+\subsection*{Additional Comment 2}
+% -----------------------------------------------------------
+
+\comment{Many readers will naturally associate the leverage constraint with a
+Lasso-type penalty and therefore expect a sparse solution, i.e.\ that only a
+small number of trees receive nonzero weights.  However, the additional
+portfolio equality constraint (i.e., the requirement that the weights sum to
+one) changes the geometry of the optimisation problem, and often leads instead
+to a dense weighting scheme.  It might be helpful to include a short remark
+about this.}
+
+\response
+We have added Remark~\ref*{rem:dense} to Section~\ref*{sec:hrf} of the
+revised manuscript.
+
+The key distinction is geometric.
+An L1 penalty alone (without any equality constraint) encourages sparsity
+because the corners of the L1 ball align with coordinate axes: the
+penalised objective is minimised at a vertex, where all but a few weights
+are zero.
+The sum-to-one equality constraint $\mathbf{1}^{\top}\mathbf{w} = 1$,
+however, restricts the feasible region to a hyperplane that generically
+passes through the interior of the L1 ball rather than through its
+sparse vertices.
+The constrained solution therefore lies on the hyperplane, which is a
+full-dimensional affine subspace; there is no geometric pressure towards
+the coordinate-axis corners, and the solution is typically dense.
+
+Intuitively, the difference between Lasso and \hrf\ is analogous to the
+difference between asset selection (Lasso finds a sparse subset of trees
+with non-zero weight) and portfolio construction (\hrf\ assigns a weight to
+every tree, possibly including short positions, to minimise prediction
+error).
+
+% -----------------------------------------------------------
+\subsection*{Additional Comment 3}
+% -----------------------------------------------------------
+
+\comment{In section 3, the authors define their specific implementation of the
+estimator: shrunk covariance matrix and a leverage constraint equal to 2.
+Later in the paper, they compare results with a leverage constraint equal to
+one and also compare to the estimator that uses the standard sample covariance
+matrix.  A number of different intuitive notations are used to define these.
+It would be ideal if this notation or some similar version could be used
+everywhere.  Using shrinkage/sample and $\kappa$ (the leverage constraint)
+equal to 1 or 2, everywhere is a possible solution.}
+
+\response
+We thank the referee for this suggestion.
+We have unified the notation throughout the paper along the lines proposed.
+Each variant of the estimator is now identified by two labels: the covariance
+estimator used (``shrinkage'' for the Ledoit--Wolf NLS estimator,
+``sample'' for the plain sample covariance) and the leverage parameter
+$\kappa \in \{1, 2\}$.
+For example, the main \hrf\ specification discussed in Section~3 is now
+consistently referred to as \hrf\ (shrinkage, $\kappa = 2$), and this
+labelling is used uniformly in the text, all tables, and the appendix,
+including the notation tables in Section~\ref*{sec:results} and the appendix.
+
+% ============================================================
+\bibliographystyle{plainnat}
+\bibliography{wolf}
+% ============================================================
+
+\end{document}
