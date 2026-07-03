@@ -10,7 +10,7 @@ datasets <- read.csv("metadata/numerical_regression.csv")
 
 #  Load results
 load_datasets <- function(dataset) {
-  results <- get(load(paste0("results/weighted_rf_mean_", dataset, ".RData")))
+  results <- get(load(paste0("results/iid/weighted_rf_mean_", dataset, ".RData")))
   results$dataset <- dataset
   return(results)
 }
@@ -105,7 +105,7 @@ plot <- ggplot(
   labs(x = NULL, y = NULL) +
   theme(axis.text.x = element_blank()) +
   scale_fill_manual(values = "#00BFc4") +
-  geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "red", linewidth = 0.15) +
   scale_y_continuous(limits = c(0.7, 1.1), expand = c(0, 0)) +
   facet_wrap(~n_obs, nrow = 1, strip.position = "bottom") +
   stat_summary(fun = mean, geom = "point", shape = 23, size = 2, fill = "red")
@@ -167,7 +167,7 @@ plot <- ggplot(
   labs(x = NULL, y = NULL) +
   theme(axis.text.x = element_blank()) +
   scale_fill_manual(values = c("#7CAE00", "#00BFc4")) +
-  geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "red", linewidth = 0.15) +
   scale_y_continuous(
     limits = c(0.9, 1.05),
     minor_breaks = seq(0.9, 1.05, 0.025)
@@ -257,6 +257,10 @@ results_ratios_rf$cesaro <- results_ratios_rf$nls_2 /
   results_ratios_rf$crf
 results_ratios_rf$ridge_ratio <- results_ratios_rf$nls_2 /
   results_ratios_rf$ridge
+results_ratios_rf$ridge_second_ratio <- results_ratios_rf$nls_2 /
+  results_ratios_rf$ridge_second
+results_ratios_rf$minvar_ratio <- results_ratios_rf$nls_2 /
+  results_ratios_rf$minvar_nls_2
 
 #  Convert to long format
 results_ratios_rf_long <- melt(
@@ -264,7 +268,9 @@ results_ratios_rf_long <- melt(
   measure.vars = c(
     "winham",
     "cesaro",
-    "ridge_ratio"
+    "ridge_ratio",
+    "ridge_second_ratio",
+    "minvar_ratio"
   ),
   id.vars = c("dataset", "n_obs"),
 )
@@ -284,11 +290,11 @@ plot <- ggplot(
   theme(legend.position = "none") +
   labs(x = NULL, y = NULL) +
   theme(axis.text.x = element_blank()) +
-  scale_fill_manual(values = c("#00B9E3", "#619CFF", "#F8766D")) +
-  geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+  scale_fill_manual(values = c("#00B9E3", "#619CFF", "#F8766D", "#7CAE00", "#C77CFF")) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "red", linewidth = 0.15) +
   scale_y_continuous(
-    limits = c(0.8, 1.1),
-    minor_breaks = seq(0.85, 1.1, 0.025)
+    limits = c(0, 1.1),
+    minor_breaks = seq(0, 1.1, 0.1)
   ) +
   facet_wrap(~n_obs, nrow = 1, strip.position = "bottom") +
   stat_summary(fun = mean, geom = "point", shape = 23, size = 2, fill = "red")
@@ -305,6 +311,8 @@ results_rmse$dataset_name <- datasets$dataset_name[match(
   results_rmse$dataset,
   datasets$dataset_id
 )]
+# Escape underscores for LaTeX (sanitize.text.function = force leaves text untouched)
+results_rmse$dataset_name <- gsub("_", "\\\\_", results_rmse$dataset_name)
 
 for (n_obs in unique(results_rmse$n_obs)) {
   results_rmse_subset <- results_rmse[results_rmse$n_obs == n_obs, ]
@@ -313,9 +321,9 @@ for (n_obs in unique(results_rmse$n_obs)) {
     order(results_rmse_subset$dataset_name),
   ]
   results_rmse_subset <- results_rmse_subset[
-    c("dataset_name", "rf", "nls_2", "wrf", "crf", "ridge")
+    c("dataset_name", "rf", "nls_2", "wrf", "crf", "ridge", "ridge_second", "minvar_nls_2")
   ]
-  colnames(results_rmse_subset) <- c("Name", "RF", "HRF", "WRF", "CRF", "Ridge")
+  colnames(results_rmse_subset) <- c("Name", "RF", "HRF", "WRF", "CRF", "Ridge", "2-Step Ridge", "HRF-MinVar")
   results_rmse_subset[
     results_rmse_subset$Name %in% c("Ailerons", "elevators"), 2:ncol(results_rmse_subset)
   ] <- results_rmse_subset[
@@ -335,7 +343,8 @@ for (n_obs in unique(results_rmse$n_obs)) {
     each = "row",
     max = FALSE,
     file = paste0("results/tables/weighted_rf_rmse_", n_obs, ".tex"),
-    include.rownames = FALSE
+    include.rownames = FALSE,
+    size = "scriptsize"
   )
   print(table, type = "latex", file = paste0("results/tables/weighted_rf_rmse_", n_obs, ".tex"))
 }
