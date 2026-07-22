@@ -28,8 +28,8 @@ transform_series <- function(x, tcode) {
 interpolate_na <- function(x) {
   idx <- seq_along(x)
   ok <- !is.na(x)
-  if (all(ok)) {
-    return(x)
+  if (sum(ok) < 2) {
+    return(x) # nothing usable to interpolate from (all-NA or single valid point)
   }
   x[!ok] <- approx(idx[ok], x[ok], xout = idx[!ok])$y
   x
@@ -41,21 +41,28 @@ load_fredmd_panel <- function(path, start_date = as.Date("1960-01-01")) {
   names(tcodes) <- colnames(raw_csv)[-1]
 
   body <- raw_csv[-1, ]
-  dates <- as.Date(body[[1]], format = "%m/%d/%Y")
-  raw <- body[, -1, drop = FALSE]
-  raw[] <- lapply(raw, as.numeric)
+  dates_full <- as.Date(body[[1]], format = "%m/%d/%Y")
+  raw_full <- body[, -1, drop = FALSE]
+  raw_full[] <- lapply(raw_full, as.numeric)
+  raw_full[] <- lapply(raw_full, interpolate_na)
 
-  keep <- dates >= start_date
-  dates <- dates[keep]
-  raw <- raw[keep, , drop = FALSE]
-  raw[] <- lapply(raw, interpolate_na)
-
-  transformed_full <- as.data.frame(mapply(
+  ## Transform on the FULL available history (back to whatever the file's
+  ## earliest date is) BEFORE restricting to start_date. Restricting first
+  ## would starve differencing transforms (tcode 2/3/5/6/7) of the prior
+  ## row(s) they need, putting an artificial leading NA at the very first
+  ## row of the window for every one of those columns and silently
+  ## excluding nearly all of them from `panel` below.
+  transformed_full_all <- as.data.frame(mapply(
     function(col, tcode) transform_series(col, tcode),
-    raw, tcodes[colnames(raw)],
+    raw_full, tcodes[colnames(raw_full)],
     SIMPLIFY = FALSE
   ))
-  colnames(transformed_full) <- colnames(raw)
+  colnames(transformed_full_all) <- colnames(raw_full)
+
+  keep <- dates_full >= start_date
+  dates <- dates_full[keep]
+  raw <- raw_full[keep, , drop = FALSE]
+  transformed_full <- transformed_full_all[keep, , drop = FALSE]
   rownames(transformed_full) <- NULL
   rownames(raw) <- NULL
 

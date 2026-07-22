@@ -39,6 +39,8 @@ stopifnot(is.na(zi[1])) # leading NA: nothing to interpolate from
 stopifnot(all.equal(zi[2:5], c(10, 15, 20, 30)))
 stopifnot(is.na(zi[6])) # trailing NA: nothing to interpolate to
 stopifnot(identical(interpolate_na(c(1, 2, 3)), c(1, 2, 3))) # no-op when no NA
+stopifnot(identical(interpolate_na(rep(NA_real_, 5)), rep(NA_real_, 5))) # all-NA: no crash, unchanged
+stopifnot(identical(interpolate_na(c(NA, 5, NA, NA)), c(NA, 5, NA, NA))) # single valid point: no crash, unchanged
 
 cat("interpolate_na: OK\n")
 
@@ -51,6 +53,10 @@ stopifnot(nrow(panel_data$raw) == length(panel_data$dates))
 stopifnot(nrow(panel_data$transformed_full) == length(panel_data$dates))
 stopifnot(ncol(panel_data$panel) <= ncol(panel_data$transformed_full))
 stopifnot(all(colSums(is.na(panel_data$panel)) == 0))
+# regression guard: transforms must be computed on full history BEFORE restricting
+# to start_date, or every differenced column gets a leading NA and panel collapses
+# to only the already-stationary (tcode 1/4) columns (~20 instead of ~110+)
+stopifnot(ncol(panel_data$panel) > 100)
 stopifnot("CPIAUCSL" %in% names(panel_data$tcodes))
 stopifnot(panel_data$tcodes[["CPIAUCSL"]] == 6)
 stopifnot(panel_data$tcodes[["FEDFUNDS"]] == 2)
