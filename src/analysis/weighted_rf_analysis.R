@@ -298,6 +298,33 @@ plot <- ggplot(
   ) +
   facet_wrap(~n_obs, nrow = 1, strip.position = "bottom") +
   stat_summary(fun = mean, geom = "point", shape = 23, size = 2, fill = "red")
+# Full comparison including 2-Step Ridge, for the referee response letter only.
+ggsave("results/weighted_rf_rmse_ratios_benchmarks_response.eps", plot)
+
+# Paper version drops 2-Step Ridge: its extreme instability around n = 1000
+# (RMSE ratio collapsing towards 0) forces an axis scale that obscures the
+# comparison among the four well-behaved benchmarks. See response letter,
+# Comment 1, for the full 2-Step Ridge results and discussion.
+results_ratios_rf_long_paper <- results_ratios_rf_long[
+  results_ratios_rf_long$variable != "ridge_second_ratio",
+]
+plot <- ggplot(
+  results_ratios_rf_long_paper,
+  aes(x = variable, y = value, fill = variable)
+) +
+  geom_boxplot() +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(x = NULL, y = NULL) +
+  theme(axis.text.x = element_blank()) +
+  scale_fill_manual(values = c("#00B9E3", "#619CFF", "#F8766D", "#C77CFF")) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "red", linewidth = 0.15) +
+  scale_y_continuous(
+    limits = c(0.8, 1.1),
+    minor_breaks = seq(0.8, 1.1, 0.05)
+  ) +
+  facet_wrap(~n_obs, nrow = 1, strip.position = "bottom") +
+  stat_summary(fun = mean, geom = "point", shape = 23, size = 2, fill = "red")
 ggsave("results/weighted_rf_rmse_ratios_benchmarks.eps", plot)
 
 #  Get RMSE tables for each number of observations
@@ -321,9 +348,9 @@ for (n_obs in unique(results_rmse$n_obs)) {
     order(results_rmse_subset$dataset_name),
   ]
   results_rmse_subset <- results_rmse_subset[
-    c("dataset_name", "rf", "nls_2", "wrf", "crf", "ridge", "ridge_second", "minvar_nls_2")
+    c("dataset_name", "rf", "nls_2", "wrf", "crf", "ridge", "minvar_nls_2")
   ]
-  colnames(results_rmse_subset) <- c("Name", "RF", "HRF", "WRF", "CRF", "Ridge", "2-Step Ridge", "HRF-MinVar")
+  colnames(results_rmse_subset) <- c("Name", "RF", "HRF", "WRF", "CRF", "Ridge", "HRF-MinVar")
   results_rmse_subset[
     results_rmse_subset$Name %in% c("Ailerons", "elevators"), 2:ncol(results_rmse_subset)
   ] <- results_rmse_subset[

@@ -1,0 +1,53 @@
+
+Attaching package: ‘CVXR’
+
+The following object is masked from ‘package:stats’:
+
+    power
+
+                id rmse_ratio mae_ratio n_obs  group tcode
+21         EXJPUSx  0.9969196 1.0000467   432     FX     5
+23         EXUSUKx  0.9993801 1.0027850   432     FX     5
+22         EXSZUSx  1.0018538 1.0043898   432     FX     5
+20         EXCAUSx  1.0029707 1.0027670   432     FX     5
+16     CUSR0000SAS  0.9746881 0.9815900   432 Prices     6
+19 DSERRG3M086SBEA  0.9820098 0.9836811   432 Prices     6
+13   CUSR0000SA0L5  0.9825219 0.9835721   432 Prices     6
+40         WPSID61  0.9825321 0.9812807   432 Prices     6
+29           PCEPI  0.9826293 0.9820299   432 Prices     6
+12   CUSR0000SA0L2  0.9866236 0.9835876   432 Prices     6
+17 DDURRG3M086SBEA  0.9868906 0.9863368   432 Prices     6
+9         CPIMEDSL  0.9878192 0.9844288   432 Prices     6
+30          PPICMM  0.9878912 0.9953218   432 Prices     6
+15     CUSR0000SAD  0.9895768 0.9844576   432 Prices     6
+14     CUSR0000SAC  0.9898524 0.9860443   432 Prices     6
+8         CPIAUCSL  0.9900568 0.9854509   432 Prices     6
+11        CPIULFSL  0.9941433 0.9888045   432 Prices     6
+38      WPSFD49207  0.9945528 0.9907679   432 Prices     6
+18 DNDGRG3M086SBEA  0.9964127 0.9945215   432 Prices     6
+7         CPIAPPSL  0.9988536 0.9973126   432 Prices     6
+41         WPSID62  0.9992075 0.9924579   432 Prices     6
+10        CPITRNSL  1.0005112 0.9975793   432 Prices     6
+39      WPSFD49502  1.0029513 0.9947732   432 Prices     6
+28       OILPRICEx  1.0044600 1.0053759   432 Prices     6
+36           TB6MS  0.9771618 0.9629953   432   Rate     2
+25             GS1  0.9780576 0.9736912   432   Rate     2
+24        FEDFUNDS  0.9810712 0.9931752   432   Rate     2
+34           TB3MS  0.9874117 0.9627931   432   Rate     2
+6            CP3Mx  0.9919201 0.9787665   432   Rate     2
+3              BAA  1.0020721 1.0079691   432   Rate     2
+27             GS5  1.0032443 1.0141928   432   Rate     2
+26            GS10  1.0169454 1.0269475   432   Rate     2
+1              AAA  1.0176056 1.0222061   432   Rate     2
+2           AAAFFM  0.9141711 0.9139947   432 Spread     1
+4           BAAFFM  0.9303616 0.9236839   432 Spread     1
+31         T10YFFM  0.9326172 0.9250349   432 Spread     1
+35        TB3SMFFM  0.9379140 0.9091029   432 Spread     1
+5        COMPAPFFx  0.9394619 0.9405204   432 Spread     1
+32          T1YFFM  0.9417917 0.9219107   432 Spread     1
+37        TB6SMFFM  0.9515972 0.9476888   432 Spread     1
+33          T5YFFM  0.9590687 0.9635256   432 Spread     1
+
+real	109m22.922s
+user	3245m26.576s
+sys	14m45.613s
