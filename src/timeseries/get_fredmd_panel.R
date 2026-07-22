@@ -25,6 +25,16 @@ transform_series <- function(x, tcode) {
   y
 }
 
+interpolate_na <- function(x) {
+  idx <- seq_along(x)
+  ok <- !is.na(x)
+  if (all(ok)) {
+    return(x)
+  }
+  x[!ok] <- approx(idx[ok], x[ok], xout = idx[!ok])$y
+  x
+}
+
 load_fredmd_panel <- function(path, start_date = as.Date("1960-01-01")) {
   raw_csv <- read.csv(path, stringsAsFactors = FALSE, check.names = FALSE)
   tcodes <- as.numeric(raw_csv[1, -1])
@@ -38,6 +48,7 @@ load_fredmd_panel <- function(path, start_date = as.Date("1960-01-01")) {
   keep <- dates >= start_date
   dates <- dates[keep]
   raw <- raw[keep, , drop = FALSE]
+  raw[] <- lapply(raw, interpolate_na)
 
   transformed_full <- as.data.frame(mapply(
     function(col, tcode) transform_series(col, tcode),

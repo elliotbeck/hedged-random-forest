@@ -32,6 +32,16 @@ stopifnot(all.equal(y7[3:6], diff(pct)))
 
 cat("transform_series: OK\n")
 
+## --- interpolate_na: fills internal gaps, leaves leading/trailing NA alone ---
+z <- c(NA, 10, NA, 20, 30, NA)
+zi <- interpolate_na(z)
+stopifnot(is.na(zi[1])) # leading NA: nothing to interpolate from
+stopifnot(all.equal(zi[2:5], c(10, 15, 20, 30)))
+stopifnot(is.na(zi[6])) # trailing NA: nothing to interpolate to
+stopifnot(identical(interpolate_na(c(1, 2, 3)), c(1, 2, 3))) # no-op when no NA
+
+cat("interpolate_na: OK\n")
+
 ## --- load_fredmd_panel: real data file ---
 panel_data <- load_fredmd_panel("data/hrf-ts/2026-06-MD.csv")
 
@@ -46,9 +56,11 @@ stopifnot(panel_data$tcodes[["CPIAUCSL"]] == 6)
 stopifnot(panel_data$tcodes[["FEDFUNDS"]] == 2)
 stopifnot(panel_data$tcodes[["BAAFFM"]] == 1)
 
-# CPIAUCSL raw levels should look like an index (order of 10s-100s), not a small pct change
+# CPIAUCSL is missing exactly 2025-10-01 in this vintage; interpolation must have filled it
 cpi_raw <- panel_data$raw[["CPIAUCSL"]]
-stopifnot(all(cpi_raw > 10 & cpi_raw < 1000, na.rm = TRUE))
+stopifnot(!any(is.na(cpi_raw)))
+# CPIAUCSL raw levels should look like an index (order of 10s-100s), not a small pct change
+stopifnot(all(cpi_raw > 10 & cpi_raw < 1000))
 
 cat("load_fredmd_panel: OK\n")
 cat("ALL PASS\n")
