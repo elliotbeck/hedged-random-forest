@@ -1,10 +1,19 @@
+source("src/timeseries/get_fredmd_panel.R")
+
+pct_change <- function(x) {
+  n <- length(x)
+  y <- rep(NA_real_, n)
+  y[2:n] <- x[2:n] / x[1:(n - 1)] - 1
+  y
+}
+
 get_target_building_block <- function(x, tcode) {
   if (tcode == 1) {
     x
   } else if (tcode == 2) {
     transform_series(x, 2)
   } else if (tcode %in% c(5, 6)) {
-    transform_series(x, 5)
+    pct_change(x)
   } else {
     stop("Unsupported tcode for building block: ", tcode)
   }
