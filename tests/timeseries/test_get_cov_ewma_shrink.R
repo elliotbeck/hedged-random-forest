@@ -32,4 +32,12 @@ sigma_hat_unshrunk <- matrix(0, p, p)
 for (t in 1:Tn) sigma_hat_unshrunk <- sigma_hat_unshrunk + w[t] * outer(Yc[t, ], Yc[t, ])
 stopifnot(!isTRUE(all.equal(result$sigma, sigma_hat_unshrunk)))
 
+## short-window edge case: Tn <= H must not crash (regression guard for a bug
+## found in review, where H > Tn - 1 made an internal loop bound count DOWN
+## instead of being empty, causing an out-of-bounds access)
+R_short <- matrix(rnorm(4 * p), 4, p)
+result_short <- get_cov_ewma_shrink(R_short, lambda = 0.15, H = 6)
+stopifnot(is.numeric(result_short$mu))
+stopifnot(all(is.finite(result_short$sigma)))
+
 cat("ALL PASS\n")

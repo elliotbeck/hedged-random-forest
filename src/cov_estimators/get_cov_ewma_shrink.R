@@ -1,6 +1,13 @@
 get_cov_ewma_shrink <- function(R, lambda = 0.15, H = 6) {
   Tn <- nrow(R)
   p <- ncol(R)
+  # Guard: the h=1..H correction terms need Tn > h observations (D_list[[t-h]]
+  # for t up to Tn requires t-h >= 1). With the project's rolling windows
+  # (Tn typically in the 340s-350s) this never binds, but without the guard
+  # a short window (Tn <= H) makes `(h+1):Tn` count DOWN in R (e.g. 7:5 is
+  # c(7,6,5), not empty), causing an out-of-bounds D_list access instead of
+  # a clean error or a reduced correction.
+  H <- max(0, min(H, Tn - 1))
   w <- lambda * (1 - lambda)^((Tn - 1):0)
 
   ## --- EWMA mean (D.1) ---
