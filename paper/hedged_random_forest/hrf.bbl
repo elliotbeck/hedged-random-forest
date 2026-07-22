@@ -200,6 +200,11 @@ L{\'o}pez~de Prado, M.~M. (2020).
 \newblock {\em Machine Learning for Asset Aanagers}.
 \newblock Cambridge University Press, Cambridge.
 
+\bibitem[McCracken and Ng, 2016]{mccracken:ng:2016}
+McCracken, M.~W. and Ng, S. (2016).
+\newblock {FRED-MD}: A monthly database for macroeconomic research.
+\newblock {\em Journal of Business \& Economic Statistics}, 34(4):574--589.
+
 \bibitem[Michaud, 1989]{michaud:1989}
 Michaud, R. (1989).
 \newblock The {M}arkowitz optimization enigma: Is optimized optimal?
@@ -224,12 +229,6 @@ Qiu, Y., Xie, T., Yu, J., and Zhang, X. (2020).
 Sancetta, A. (2008).
 \newblock Sample covariance shrinkage for high dimensional dependent data.
 \newblock {\em Journal of Multivariate Analysis}, 99(5):949--967.
-
-\bibitem[Timmermann, 2006]{timmermann:2006}
-Timmermann, A. (2006).
-\newblock Forecast combinations.
-\newblock In Elliott, G., Granger, C. W.~J., and Timmermann, A., editors, {\em
-  Handbook of Economic Forecasting}, pages 135--196. North Holland, Amsterdam.
 
 \bibitem[Varian, 2014]{varian2014big}
 Varian, H.~R. (2014).
