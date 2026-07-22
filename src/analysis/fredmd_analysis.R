@@ -103,7 +103,11 @@ plot <- ggplot(d, aes(x = group_wrap, y = rmse_ratio, fill = group_wrap)) +
   scale_y_continuous(limits = c(0.88, 1.03), minor_breaks = seq(0.88, 1.03, 0.02)) +
   stat_summary(fun = mean, geom = "point", shape = 23, size = 2, fill = "red")
 
-ggsave("paper/hedged_random_forest/graphs/fredmd_rmse_ratios_boxplot.eps", plot,
+ggsave("results/fredmd_rmse_ratios_boxplot.eps", plot,
   width = 6.01, height = 5, units = "in"
 )
-cat("wrote graphs/fredmd_rmse_ratios_boxplot.eps\n")
+file.copy("results/fredmd_rmse_ratios_boxplot.eps",
+  "paper/hedged_random_forest/graphs/fredmd_rmse_ratios_boxplot.eps",
+  overwrite = TRUE
+)
+cat("wrote results/fredmd_rmse_ratios_boxplot.eps and graphs/fredmd_rmse_ratios_boxplot.eps\n")
