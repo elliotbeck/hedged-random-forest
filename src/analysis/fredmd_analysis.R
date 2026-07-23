@@ -100,7 +100,11 @@ plot <- ggplot(d, aes(x = group_wrap, y = rmse_ratio, fill = group_wrap)) +
   theme(legend.position = "none") +
   labs(x = NULL, y = NULL) +
   geom_hline(yintercept = 1, linetype = "dashed", color = "red", linewidth = 0.15) +
-  scale_y_continuous(limits = c(0.88, 1.03), minor_breaks = seq(0.88, 1.03, 0.02)) +
+  scale_y_continuous(
+    limits = c(0.9, 1.02),
+    breaks = seq(0.90, 1.02, 0.04),
+    minor_breaks = seq(0.90, 1.02, 0.02)
+  ) +
   stat_summary(fun = mean, geom = "point", shape = 23, size = 2, fill = "red")
 
 ggsave("results/fredmd_rmse_ratios_boxplot.eps", plot,
