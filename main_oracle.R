@@ -16,9 +16,9 @@ n_test <- 20000
 
 results_oracle <- get_simulation_oracle(
   n_obs_grid = n_obs_grid,
+  d_grid = 10,
   num_trees = n_trees,
   kappa = kappa,
-  d = 10,
   noise_sd = 1,
   n_oracle = n_oracle,
   n_test = n_test,

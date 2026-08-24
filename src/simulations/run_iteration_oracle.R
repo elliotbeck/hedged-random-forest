@@ -83,6 +83,7 @@ run_iteration_oracle <- function(n_obs,
 
   c(
     n_obs = n_obs,
+    d = d,
     rf = rf,
     hrf_oracle = hrf_oracle,
     hrf_sample = hrf_sample,

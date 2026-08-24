@@ -2,7 +2,7 @@
 # irrelevant (pure-noise) predictors grows, holding the same Friedman-1
 # relevant structure (x1-x5) and the same training-set-size grid as Major
 # Comment 3 fixed.
-source("src/simulations/get_simulation_oracle_dim.R")
+source("src/simulations/get_simulation_oracle.R")
 
 set.seed(42)
 n_obs_grid <- c(200, 400, 600, 800, 1000, 2000, 3000, 4000, 5000)
@@ -13,9 +13,9 @@ n_sim <- 100
 n_oracle <- 50000
 n_test <- 20000
 
-results_oracle_dim <- get_simulation_oracle_dim(
+results_oracle_dim <- get_simulation_oracle(
   n_obs_grid = n_obs_grid,
-  d_irrelevant_grid = d_irrelevant_grid,
+  d_grid = 5 + d_irrelevant_grid,
   num_trees = n_trees,
   kappa = kappa,
   noise_sd = 1,
@@ -24,6 +24,7 @@ results_oracle_dim <- get_simulation_oracle_dim(
   n_sim = n_sim,
   mc.cores = min(n_sim, parallel::detectCores())
 )
+results_oracle_dim$d_irrelevant <- results_oracle_dim$d - 5
 
 dir.create("results/oracle", showWarnings = FALSE, recursive = TRUE)
 save(results_oracle_dim, file = "results/oracle/results_oracle_dim.RData")
