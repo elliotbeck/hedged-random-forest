@@ -10,6 +10,7 @@ get_forecast_vintage_ts <- function(panel, target_block, target_raw, origin_idx,
   max_h <- max(horizons)
   block_rf <- numeric(max_h)
   block_hrf <- numeric(max_h)
+  block_hrf_minvar <- numeric(max_h)
 
   for (j in seq_len(max_h)) {
     n_train <- W - j
@@ -28,17 +29,20 @@ get_forecast_vintage_ts <- function(panel, target_block, target_raw, origin_idx,
     )
     block_rf[j] <- lead_result$rf
     block_hrf[j] <- lead_result$hrf
+    block_hrf_minvar[j] <- lead_result$hrf_minvar
   }
 
   x_t <- target_raw[origin_idx]
   raw_rf <- aggregate_building_block(x_t, block_rf, tcode)
   raw_hrf <- aggregate_building_block(x_t, block_hrf, tcode)
+  raw_hrf_minvar <- aggregate_building_block(x_t, block_hrf_minvar, tcode)
 
   Tn <- length(target_raw)
   data.frame(
     horizon = horizons,
     rf_forecast = raw_rf[horizons],
     hrf_forecast = raw_hrf[horizons],
+    hrf_minvar_forecast = raw_hrf_minvar[horizons],
     actual = ifelse(origin_idx + horizons <= Tn, target_raw[pmin(origin_idx + horizons, Tn)], NA_real_)
   )
 }

@@ -15,13 +15,15 @@ result <- get_forecast_lead(X[1:(n - 1), , drop = FALSE], y[1:(n - 1)], X_test,
 )
 
 stopifnot(is.list(result))
-stopifnot(all(c("rf", "hrf") %in% names(result)))
+stopifnot(all(c("rf", "hrf", "hrf_minvar") %in% names(result)))
 stopifnot(is.numeric(result$rf) && length(result$rf) == 1)
 stopifnot(is.numeric(result$hrf) && length(result$hrf) == 1)
-stopifnot(is.finite(result$rf) && is.finite(result$hrf))
+stopifnot(is.numeric(result$hrf_minvar) && length(result$hrf_minvar) == 1)
+stopifnot(is.finite(result$rf) && is.finite(result$hrf) && is.finite(result$hrf_minvar))
 
 ## both forecasts should be in a plausible range given y's scale (not exploding)
 stopifnot(abs(result$rf) < 5)
 stopifnot(abs(result$hrf) < 5)
+stopifnot(abs(result$hrf_minvar) < 5)
 
 cat("ALL PASS\n")

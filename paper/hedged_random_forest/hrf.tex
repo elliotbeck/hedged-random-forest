@@ -628,8 +628,15 @@ optimization problem \eqref{eq:mf1}--\eqref{eq:mf3} are now in place.
 The solution~$\hat w$
 assigns weight $\hat w_j$ to tree $\M_j$ rather than weight
 $1/p$ as for the standard random forest~(RF). We call this weighted random
-forest the {\em hedged random forest} (HRF). A corresponding software implementation in the programming language {\sc R} can be found at 
+forest the {\em hedged random forest} (HRF). A corresponding software implementation in the programming language {\sc R} can be found at
 \href{https://github.com/elliotbeck/hedgedrf}{{\tt https://github.com/elliotbeck/hedgedrf}}.
+
+\textcolor{blue}{Unless stated otherwise, from this point on we use the term HRF to
+refer specifically to this baseline specification, that is, nonlinear
+shrinkage estimation of $\Sigma$ combined with $\kappa = 2$. Whenever we
+depart from this default---for example, by using the sample covariance
+matrix instead of nonlinear shrinkage, or a value of $\kappa$ other than
+$2$---we state so explicitly.}
 
 
 \begin{remark}[Absence of cross-validation]

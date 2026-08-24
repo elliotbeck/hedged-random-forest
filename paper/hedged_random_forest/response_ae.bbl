@@ -1,0 +1,32 @@
+\begin{thebibliography}{4}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Beck and Wolf(2025)]{beck:wolf:hrf-inf}
+Elliot Beck and Michael Wolf.
+\newblock Forecasting inflation with the hedged random forest.
+\newblock Working paper, University of Zurich, 2025.
+\newblock Available at SSRN: {\tt https://ssrn.com/abstract=5162541}.
+
+\bibitem[Beck et~al.(2024)Beck, Kozbur, and Wolf]{beck:kozbur:wolf:2024}
+Elliot Beck, Damian Kozbur, and Michael Wolf.
+\newblock The hedged random forest.
+\newblock Working paper, University of Zurich, 2024.
+\newblock Available at SSRN: {\tt https://ssrn.com/abstract=5032102}.
+
+\bibitem[Friedman(2001)]{friedman:2001}
+Jerome~H Friedman.
+\newblock Greedy function approximation: A gradient boosting machine.
+\newblock \emph{Annals of Statistics}, 29\penalty0 (5):\penalty0 1189--1232,
+  2001.
+
+\bibitem[McCracken and Ng(2016)]{mccracken:ng:2016}
+Michael~W McCracken and Serena Ng.
+\newblock {FRED-MD}: A monthly database for macroeconomic research.
+\newblock \emph{Journal of Business \& Economic Statistics}, 34\penalty0
+  (4):\penalty0 574--589, 2016.
+
+\end{thebibliography}

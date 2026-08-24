@@ -1,0 +1,386 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{xr}
+\externaldocument{hrf}
+
+\newcommand*{\defeq}{\mathrel{\vcenter{\baselineskip0.5ex\lineskiplimit0pt\hbox{\scriptsize.}\hbox{\scriptsize.}}}=}
+\newcommand*{\eqdef}{=\mathrel{\vcenter{\baselineskip0.5ex\lineskiplimit0pt\hbox{\scriptsize.}\hbox{\scriptsize.}}}}
+
+% Referee comment box
+\newmdenv[
+  linecolor=gray!50,
+  backgroundcolor=gray!8,
+  innerleftmargin=10pt,
+  innerrightmargin=10pt,
+  innertopmargin=8pt,
+  innerbottommargin=8pt,
+  skipabove=10pt,
+  skipbelow=4pt
+]{refbox}
+
+\newcommand{\comment}[1]{\begin{refbox}\itshape #1\end{refbox}}
+\newcommand{\response}{\medskip\noindent\textbf{Response.}\ }
+\renewcommand{\baselinestretch}{1.12}
+\newcommand{\hrf}{\textsc{hrf}}
+\newcommand{\rf}{\textsc{rf}}
+
+\title{Response to Report by Referee 2\\[6pt]
+  \large ``The Hedged Random Forest''\\
+  \normalsize Journal of Financial Econometrics --- JFEC-2025-167}
+\author{E.\ Beck \and D.\ Kozbur \and M.\ Wolf}
+\date{}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+We thank the referee for the careful reading and constructive suggestions.
+The report has led to meaningful improvements in the paper.
+Below we address each point in turn.
+All section, equation, and table references are to the revised manuscript.
+
+% ============================================================
+\section*{Major Comments}
+% ============================================================
+
+% -----------------------------------------------------------
+\subsection*{Comment 1}
+% -----------------------------------------------------------
+
+\comment{Core methodological issues in estimating $(\mu, \Sigma)$. The entire
+method relies on estimating the mean and covariance of prediction errors
+across trees. In the current implementation, these quantities are estimated
+from in-sample residuals of trees trained on the same data. This is
+problematic for two reasons: (i) in-sample residuals can be biased due to
+overfitting, (ii) they can distort the dependence structure across trees, and
+therefore the estimation of the covariance matrix. As a result, the estimated
+covariance matrix $\hat\Sigma$ may not reflect the true out-of-sample risk.
+Also, since the optimization objective $(w^\top \mu)^2 + w^\top \Sigma w$
+depends on the structure of $\Sigma$, it is not clear how biased estimates
+$\hat\Sigma$ affect the optimized weights.
+
+As a related note, Remark 2.1 does not provide a valid justification for the
+use of in-sample residuals. The scale-invariance argument is not sufficient
+to account for the bias introduced by estimating $\Sigma$ (and $\mu$) using
+in-sample residuals. It is true that multiplying $(\mu, \Sigma)$ by a
+constant does not change the optimizer, but in-sample vs.\ out-of-sample
+error differs in more than just scale (in particular, they alter the
+dependence structure of the errors across trees).
+
+A possible solution to this shortcoming would be to use cross-validated or
+out-of-sample errors. Currently, Remark 3.1 argues that cross-validation is
+not applicable because different folds produce different tree ensembles.
+However, this is not a valid objection. Cross-validation is designed to
+estimate moments of out-of-sample prediction errors, and the fact that
+models differ across folds is standard in machine learning and does not
+invalidate the procedure. Unlike what is stated in the main text, even
+linear regression models change across folds, as their estimated parameters
+change.
+
+Overall, the key statistical question that is currently not addressed is
+whether using cross-validated errors to estimate the covariance matrix
+yields a consistent estimator of~$\Sigma$.}
+
+\response
+% We believe that, following Remark 3.1, is not quite the best fit for our situation to do CV.  One general reason for this is because we are doing post-estimation tuning. Additionally, if we did do cross-validation run, we would have vastly different trees corresponding to estimated weights, given the depth of tree that we use.
+% Finally, we think that CV runs the risk of cutting the data too thinly.
+
+
+We understand the referee's motivation for suggesting cross-validation, but we believe there is an important distinction between using cross-validation to evaluate the predictive risk of a learning algorithm and using it to estimate the joint error distribution of the particular $p$ forecast methods that are subsequently to be combined. The latter is what is required by HRF.
+
+To illustrate the distinction, consider first an ensemble consisting of $p$ prespecified linear regression models. Model $j$ might use a particular set of regressors and a particular estimation method, such as OLS, Ridge, or Lasso. Under $K$-fold cross-validation, its estimated coefficients will of course differ across folds. Nevertheless, model $j$ retains its identity: the same specification (that is, set of regressors) and estimation rule are applied in every fold. Consequently, the held-out observations provide pseudo-out-of-sample errors that can be associated with model $j$, and the joint pseudo-out-of-sample errors across models can be used to estimate their joint error moments (mean and covariance matrix).
+
+The situation is different for the individual trees of a random forest. HRF assigns weights to the $p$ particular trees $(T_1,\ldots,T_p)$ grown on the training sample. If the random-forest algorithm is rerun after deleting a CV fold, it produces a new collection of trees $(T_1^{(-k)},\ldots,T_p^{(-k)})$. These are not reestimated versions of $(T_1,\ldots,T_p)$ in the same sense that regression coefficients are reestimated across folds. Their split variables, split points, topology, and terminal nodes can all change, and there is no natural correspondence between, say, $T_j^{(-k)}$ and $T_j$. Cross-validation therefore provides out-of-sample errors for the random-forest learning procedure, but not out-of-sample errors for the $p$ particular trees whose (estimated) joint error moments are needed to determine the HRF weights.
+
+This is why the fact that fitted regression coefficients also change across CV folds does not resolve the issue. Parameter estimates may change while the identity of a prespecified regression model remains intact. For a data-grown tree, the predictor itself is selected by the training data and generally changes when the training sample changes. A specialized sample-splitting procedure could instead grow trees on one subsample and estimate their error moments on another, but this would both reduce the data available for growing the forest and define a different procedure from the one studied in the paper. For these reasons, we do not believe that conventional cross-validation provides the required estimate of the joint out-of-sample error distribution of the particular trees entering HRF.
+
+We agree with the referee that scale invariance does not eliminate all potential differences between in-sample and out-of-sample prediction errors. In particular, in-sample residuals may distort not only the scale of the errors but also their dependence structure across trees. Our point in Remark~2.1 was not that scale invariance solves this problem, but rather that it mitigates one aspect of it: any common multiplicative distortion of $(\mu,\Sigma)$ that leaves the HRF optimization problem unchanged does not affect the resulting weights. We have revised the discussion to make this more limited claim explicit.
+
+More generally, we do not require or claim that the estimated inputs $(\hat \mu,\hat\Sigma)$ perfectly recover their out-of-sample counterparts. HRF is a feasible plug-in procedure, and the relevant question for the purpose of this paper is ultimately whether the weights obtained from these `imperfectly estimated' inputs improve out-of-sample predictive performance relative to the equal-weighted random forest. Our extensive empirical results answer this question strongly in the affirmative: across the datasets and training-set sizes considered in the paper, HRF consistently delivers improved out-of-sample predictive accuracy relative to the standard random forest,
+and also relative to three other weighted random forests previously suggested in the literature. 
+
+Finally, we emphasize that we do not assume that the feasible estimates
+$(\hat{\mu},\hat{\Sigma})$ recover the oracle quantities without
+error. Whether the resulting estimation error is sufficiently severe to
+eliminate the gains from optimized tree weighting is ultimately an empirical
+question. The new simulation study described in detail in our response to
+Comment 3 addresses precisely this issue. There, because the data-generating
+process is known, we can compare the oracle HRF based on 
+the true inputs $(\mu,\Sigma)$
+directly with the feasible HRF based on the estimated inputs
+$(\hat{\mu},\hat{\Sigma})$. The results confirm the referee's concern
+that estimation entails a non-negligible price, particularly for small
+training samples. Importantly, however, the feasible HRF retains a substantial
+part of the oracle advantage and continues to outperform the equal-weighted RF
+at every training-set size considered. Moreover, nonlinear shrinkage
+consistently reduces the estimation price relative to the sample covariance
+matrix. We refer to our response to Comment~3 for the full design and results.
+
+Note that we have reworked Remark 3.1 along these lines to make the point clearer. 
+
+% -----------------------------------------------------------
+\subsection*{Comment 2}
+% -----------------------------------------------------------
+
+\comment{Missing theoretical guarantees. The article presents an oracle
+problem and a plug-in estimator but provides no theoretical guarantees for
+the latter. Ideally, there should be a discussion around these:
+\begin{enumerate}
+\item Conditions under which the trees are consistent, relying on
+established assumptions in the random forest literature, such as honesty
+(see, e.g., Wager and Athey, 2018).
+\item Conditions under which cross-validated errors across trees allow for
+a consistent estimation of $\mu$ and $\Sigma$.
+\end{enumerate}
+The second point is likely non-trivial, but even a high-level discussion
+would significantly strengthen the paper. At present, it is unclear whether
+the proposed estimator targets the true out-of-sample risk.}
+
+\ 
+
+\response
+% In terms of the missing theoretical guarantees, this was a choice that we weighed for quite some time in drafting the paper.  
+% Our reasoning for passing on the chance to do this analysis was two fold.  First, the conditions under which individual trees are consistent is somewhat at odds with the way that may trees are grown in practice, due to restrictive tree depth and feature number conditions. Second, if the number of trees is large, we do not believe that consistency offers the right approximation for the estimated covariance.
+% In particular, if $\hat \Sigma \not \to \Sigma$ then you cannot prove that $\hat w_{\text{HRM}} \to w_{\text{Optimal}}$ for some definition of optimal weights (corresponding to an optimality or loss criteria).  For clarity in this letter, let $Q$ be a loss function for forecasts.  Then the convergence of the weights does not rule out that for every feasible alternative weight estimation scheme within some class, that $\text{p-}\underset{n \to \infty, p/n \leq C }{\lim \inf} [Q( \hat w_\text{HRM}) - Q( \hat w_{\text{Alternative}})] \geq c > 0.$ 
+% The above can be demonstrated with the equal weighted portfolio.  Let $\hat w_{\text{Alternative}} = 1/p.$  If the covariance of the forecasts is not the identity, then $\hat w_{\text{Alternative}}$ is not optimal.  On the other hand, $\hat w_{\text{Alternative}}$ have vanishing empirical correction (over $j\leq p$) with $\hat w_{\text{Optimal}}$ with probability $\to 1$.  And in fact, any estimator $\hat w$ which exhibits positive correlation with $w_{\text{Optimal}}$ will improve upon $Q$.
+%  Note that in most leading random matrix models for covariance, in which covariances cannot be consistently estimated, including in the realistic case in which $p/n \not \to 0$, one still has, $\text{corr}(w(\hat S), w_{\text{Optimal}}) > \text{corr}(1/p), w_{\text{Optimal}}$.  This is a consequence of correlation of spectra in that \textcolor{black}{ $\text{corr}(\hat s, s) > \text{corr}(1/p, s),$ which is much stronger than $\hat s \rightarrow s.$  This needs more care than I gave it, because the spectral decomposition of the sample covariance has different eigenvectors as the population covariance, but those are correlated also in a particular sense too.} Note that in \cite{bai:silverstein:1998} there is a discussion of a related (but slightly different problem), in which case the same phenomenon as above is exhibited.  Given that this phenomenon is not new, we didn't choose to use up space with it in the first round.  
+
+
+We appreciate the referee's interest in theoretical guarantees. We have been explicit throughout the paper that we do not establish consistency or asymptotic optimality results for HRF, and we do not intend to make such claims. Our objective is instead to propose a simple, low-tuning post-estimation modification of the random forest and to investigate whether it improves out-of-sample predictive performance in finite samples.
+
+Regarding the referee's first point, consistency results for random forests are available under assumptions such as honesty and other restrictions on how the trees are grown. Such results are valuable, but the assumptions underlying them characterize particular theoretical random-forest constructions and do not necessarily correspond to the practical random-forest implementation studied in this paper. Imposing such assumptions in order to obtain a consistency result would therefore require us either to study a different estimator or to substantially change the framework of the paper.
+
+The referee's second point raises an additional difficulty. In our implementation, the number of trees $p$ is large and generally not negligible relative to the training-sample size $n$. Consequently, an asymptotic framework in which $p$ is fixed while $n$ tends to infinity does not provide a particularly useful approximation to the setting of interest. A more relevant framework would allow, for example, 
+for the ratio $p/n$ to converge to a positive constant. In such a high-dimensional setting, consistent estimation of a general covariance matrix $\Sigma$ is not available without imposing substantial additional structure, such as sparsity.
+Indeed, this high-dimensional covariance-estimation problem is precisely one motivation for using nonlinear shrinkage rather than the sample covariance matrix. We therefore do not believe that consistency of $\hat{\Sigma}$ is the appropriate requirement for evaluating the proposed procedure. As discussed in our response to Comment~1, our focus is instead on whether the estimated inputs are sufficiently informative to produce weights that improve out-of-sample prediction
+for relevant training-sample sizes $n$ in practice. 
+
+Finally, Section 4.4.2 provides a useful empirical illustration of why we distinguish theoretical guarantees from finite-sample predictive performance. There, we compare HRF with 
+the Optimal Weighted Random Forest (OWRF) for which 
+\cite{chen:yu:zhang:2024},
+establish asymptotic optimality in the sense that its squared loss and risk are asymptotically identical to those of the infeasible best possible weighted random forest.
+We conduct this comparison on the 12 datasets used by the OWRF authors themselves, thereby avoiding any selection of datasets favorable to HRF. HRF achieves lower out-of-sample prediction error than OWRF on all 12 datasets (for two different metrics). 
+We do not view this finding as diminishing the value of OWRF's theoretical results. Rather, it illustrates that asymptotic optimality and finite-sample predictive performance may well be distinct properties. The contribution of the present paper is deliberately focused on the latter. 
+
+\newpage
+% -----------------------------------------------------------
+\subsection*{Comment 3}
+% -----------------------------------------------------------
+
+\comment{Numerical experiments. I appreciate the extensive numerical
+experiments applied to several datasets. However, given the central role of
+$\Sigma$ in the quality of the procedure, the empirical section should be
+extended to determine whether the HRF has a structural advantage over RF.
+Denote by HRF($S$) the MSE achieved by HRF using the covariance matrix $S$,
+and denote by RF the MSE achieved by classical random forest. The quantity
+under study is
+$$
+\text{HRF}(\hat\Sigma) - \text{RF} =
+\underbrace{\text{HRF}(\Sigma) - \text{RF}}_{\text{structural advantage of HRF}}
++ \underbrace{\text{HRF}(\hat\Sigma) - \text{HRF}(\Sigma)}_{\text{estimation effect}}.
+$$
+Currently, the paper only evaluates $\text{HRF}(\hat\Sigma) - \text{RF}$, and
+therefore it is unclear whether the observed gains stem from a structural
+improvement or from estimation effects.
+
+I suggest including a simulation study where the ground truth is known, and
+compute the decomposition for $\hat\Sigma$ estimated with in-sample residuals
+and with cross-validated (or out-of-sample) residuals.}
+
+\response
+We have implemented exactly this decomposition in a simulation with a known
+ground truth. We use the nonlinear regression function of
+\citet{friedman:1991}: $X \in [0,1]^{10}$ with
+$$
+y = 10 \sin(\pi x_1 x_2) + 20 (x_3 - 0.5)^2 + 10 x_4 + 5 x_5 + \varepsilon~,
+\qquad \varepsilon \sim N(0,1),
+$$
+where $x_6, \ldots, x_{10}$ are pure noise features, unrelated to $y$.
+
+For each repetition, we grow a single forest of $p = 500$ trees on a
+training sample of size~$n$ (the same $n$ used throughout the paper's other
+simulations) and hold these trees fixed throughout. From the same $p$
+trees we construct three sets of \hrf\ weights:
+\begin{itemize}
+\item \emph{Oracle}: $(\mu,\Sigma)$ computed from the trees'
+residuals on a large, separate, out-of-sample set of 50{,}000
+observations, standing in for the true $(\mu, \Sigma)$ for these specific
+trees.
+\item \emph{In-sample, sample covariance}: $(\hat\mu, \hat\Sigma)$
+computed from the trees' in-sample residuals (the training data itself),
+using the sample mean respectively the sample covariance matrix.
+\item \emph{In-sample, NLS}: using the same in-sample residuals,
+with $\hat \mu$ being again the sample mean,
+but now with $\hat\Sigma$ obtained via the nonlinear shrinkage estimator used
+throughout the paper. This is the manuscript's leading specification for HRF with i.i.d.\ data.
+\end{itemize}
+Every resulting weight vector, together with the equal-weighted RF
+benchmark, is then scored the same way: we form forecasts from this same
+forest on a further, independent test sample of 20{,}000 observations and
+compare them to the true outcomes there. This directly yields
+$\text{RF}$, $\text{HRF}(\mu,\Sigma)$, and $\text{HRF}(\hat \mu, \hat\Sigma)$ (for both
+covariance estimators) as genuine out-of-sample MSEs, from which the
+decomposition in the report follows by simple subtraction. We repeat this
+100 times per training-set size $n \in \{200, \ldots, 5000\}$ (the same
+grid used elsewhere in the paper) and report the average.
+
+\begin{center}
+\begin{tabular}{cccccc}
+\toprule
+& \multicolumn{1}{c}{\multirow{2}{*}{\shortstack{Oracle\\advantage}}} & \multicolumn{2}{c}{Estimation price} & \multicolumn{2}{c}{Feasible advantage} \\
+\cmidrule(lr){3-4} \cmidrule(lr){5-6}
+\multicolumn{1}{c}{$n$} & & \multicolumn{1}{c}{Sample} & \multicolumn{1}{c}{NLS} & \multicolumn{1}{c}{Sample} & \multicolumn{1}{c}{NLS} \\
+\midrule
+200  & $-3.18$ & $2.09$ & $1.76$ & $-1.09$ & $-1.43$ \\
+400  & $-1.92$ & $1.24$ & $1.07$ & $-0.69$ & $-0.86$ \\
+600  & $-1.44$ & $0.92$ & $0.81$ & $-0.52$ & $-0.63$ \\
+800  & $-1.19$ & $0.73$ & $0.64$ & $-0.46$ & $-0.54$ \\
+1000 & $-1.02$ & $0.62$ & $0.55$ & $-0.40$ & $-0.47$ \\
+2000 & $-0.66$ & $0.37$ & $0.33$ & $-0.29$ & $-0.32$ \\
+3000 & $-0.51$ & $0.26$ & $0.24$ & $-0.25$ & $-0.27$ \\
+4000 & $-0.44$ & $0.21$ & $0.19$ & $-0.23$ & $-0.25$ \\
+5000 & $-0.40$ & $0.18$ & $0.16$ & $-0.22$ & $-0.24$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+In this table, $\text{oracle advantage} \defeq  \text{HRF}(\mu,\Sigma) - \text{RF}$ and
+$\text{estimation effect}  \defeq \text{HRF}(\hat \mu, \hat\Sigma) - \text{HRF}(\mu, \Sigma)$. Therefore, (i) 
+negative values of ``advantage" favor \text{HRF} over \text{RF} 
+and (ii)~estimation price" quantifies the price to pay by using estimates $\hat \mu$ and $\hat \Sigma$ instead of the oracle quantities $\mu$ and $\Sigma$ as inputs for HRF. Thus, feasible advantage $=$ oracle advantage $+$ estimation price.
+
+There are three findings. First, HRF has a genuine oracle advantage
+over RF at every training-set size: With the true inputs $\mu$ and $\Sigma$,
+HRF always
+achieves lower MSE than the equal-weighted forest, and this advantage is
+largest precisely where the paper's real-data gains are also largest, for small $n$,
+and decreases steadily as $n$ grows. Second, estimation of the inputs $\mu$ and $\Sigma$ indeed incurs a price, 
+exactly as the referee suspects: Moving from the oracle HRF to a
+feasible HRF loses a noticeable part of the advantage over RF,
+particularly for small $n$. Third, and directly
+relevant to Comment 1, using the nonlinear shrinkage estimator~$\hat \Sigma$ consistently
+retains more of HRF's advantage over RF compared to using
+the sample covariance matrix, for every training-set size $n$.
+
+\newpage
+% ============================================================
+\section*{Minor Comments}
+% ============================================================
+
+% -----------------------------------------------------------
+\subsection*{Comment 1}
+% -----------------------------------------------------------
+
+\comment{The empirical evidence is positive but somewhat mixed. In
+particular, the improvements depend on the specific dataset, and some of the
+reported gains are often small (ratios $\approx 1$). It would be helpful to
+provide some uncertainty quantification for the results in Appendix B.}
+
+\response
+We agree that the magnitude of the improvement of HRF over RF varies across datasets and training-sample sizes $n$. We believe that such heterogeneity is natural: there is no reason to expect optimized tree weighting to provide the same incremental benefit for every data-generating process and every training-sample size. Indeed, there are some individual cases in Appendix~B in which HRF slightly underperforms the equal-weighted RF. The relevant empirical pattern, in our view, is the performance across the experiments as a whole. On balance, HRF clearly outperforms RF, and the relative performance within a given dataset tends to be consistent across training-sample sizes. Moreover, the performance comparison is asymmetric: when HRF improves upon RF, the gains can be substantial, whereas in the cases in which HRF underperforms RF, the losses are generally small. Thus, from the perspective of an applied user choosing between the two procedures, the empirical results strongly favor HRF.
+
+Regarding uncertainty quantification, the reported performance measures in Appendix~B are already based on MSE
+averages (for both HRF and RF)
+over $B=100$ repetitions, as defined in Equation~(4.1). Thus, the relevant Monte Carlo uncertainty in the reported ratios is controlled by the choice of $B$. To assess whether $B=100$ is sufficiently large, we repeated selected experiments using $B=1000$ instead. The resulting performance ratios were virtually identical to those obtained with $B=100$. We therefore conclude that the Monte Carlo error associated with the finite number $B$ of repetitions is negligible for the reported results
+and do not believe that reporting separate uncertainty measures for the large number of individual ratios in Appendix~B would provide materially additional information.
+
+% -----------------------------------------------------------
+\subsection*{Comment 2}
+% -----------------------------------------------------------
+
+\comment{The advantage of HRF appears to decrease with sample size. This is
+somewhat concerning and should be studied in more detail through a
+simulation study with increasing sample sizes.}
+
+\response
+    % From an epistemological persepctive we find this somewhat encouraging.  We already know that random forests, regardless of tree-weighting scheme, can approximate general functions.  So the fact that the advantages becomes less noticeable as sample size increases just suggests that philosophically, a theory of everything is at least feasible.  If we start adding thousands or millions of variables of quantities we'd never before been able to measure, collect or consieve of, then we expect to see the advantage to hedging to reemerge.
+
+    We thank the referee for this suggestion. The new simulation study described in our response to Major Comment 3 also allows us to investigate directly how the advantage of HRF changes with sample size. In that experiment, we consider training-set sizes ranging from $n=200$ to $n=5000$, while holding the data-generating process fixed. Moreover, because the simulation provides us with an effectively known ground truth, we can distinguish the oracle advantage of HRF from the effects of estimating its inputs.
+    
+The results confirm the pattern noted by the referee: the advantage of HRF over the equal-weighted RF is largest for small $n$ and decreases as $n$ grows. Importantly, however, the same pattern is present for the oracle HRF, which uses the true inputs $(\mu,\Sigma)$. Its MSE advantage over RF decreases from 3.18 at $n=200$ to 0.40 at $n=5000$, but remains positive at every sample size considered. Thus, the declining advantage with $n$ is not an artifact of estimating $\mu$ or $\Sigma$, nor does it indicate a deterioration in the performance of the feasible HRF. Rather, as the sample size increases, the equal-weighted random forest becomes an increasingly strong benchmark, leaving less scope for optimized tree weighting to improve upon it.
+
+The feasible HRF exhibits the same qualitative pattern. Using nonlinear shrinkage to estimate $\Sigma$, its MSE advantage over RF decreases from 1.43 at $n=200$ to 0.24 at $n=5000$, while remaining positive throughout. We therefore agree with the referee's observation that the incremental benefit of hedging is most pronounced at smaller sample sizes; the additional simulation shows that this behavior reflects a diminishing structural scope for gains from optimized weighting rather than an adverse estimation effect.
+
+% -----------------------------------------------------------
+\subsection*{Comment 3}
+% -----------------------------------------------------------
+
+\comment{In the numerical experiment, it is unclear why large datasets are
+first reduced to 10,000 observations since they are later subsampled $B$
+times with $n < 10{,}000$. It would be helpful to clarify this point.}
+
+\response
+We down-sample to 10,000 observations because the prediction step of the procedure is still expensive.  The complement of that 10,000 is nonetheless retained for evaluation.  This explanation is now also included in the text.
+
+% -----------------------------------------------------------
+\subsection*{Comment 4}
+% -----------------------------------------------------------
+
+\comment{The current datasets are relatively low-dimensional. Given that
+tree-based methods are effective in high dimensions, especially when some
+predictors contribute little to the response, it would be helpful to assess
+the performance of HRF in such regimes (e.g., via a simulation study).}
+
+\response
+We first note that our existing empirical analysis of Sections 4.1--4.2
+already includes several genuinely high-dimensional settings. Among the 17 datasets listed in Table 1, ailerons contains 734 features and isolet contains 614 features. Since we consider training-sample sizes as small as $n=200,400$,and $600$, this gives six dataset/training-size combinations in which the number of features exceeds the number of training observations. Inspection of the corresponding results in Tables~4--6 of Appendix B shows that HRF achieves a lower RMSE than the equal-weighted RF in five of these six high-dimensional scenarios, while in the remaining scenario the two methods have the same RMSE (up to the reported rounding precision). Thus, the existing empirical evidence already indicates that HRF performs well when the number of features is large relative to the available training sample.
+
+Nevertheless, we agree with the referee that it is useful to investigate this issue in a controlled setting, particularly when an increasing fraction of the predictors / feautures is irrelevant…
+
+\newpage
+% -----------------------------------------------------------
+\subsection*{Comment 5}
+% -----------------------------------------------------------
+
+\comment{I would move Section 4.4.2 to the appendix, as it mainly focuses on
+the limitations/ reproducibility issues of an alternative method rather than
+showing the strengths of HRF. In the main text, I would just mention that
+this competing method is not clearly reproducible.}
+
+\response
+We thank the referee for this suggestion. We agree that reproducibility issues should not be the main focus of Section~4.4.2, and we have streamlined that discussion accordingly. We nevertheless believe that the substantive comparison in this section is important enough to remain in the main text.
+
+The competing method is particularly relevant because, like HRF, it seeks to improve random forests through optimized tree weighting, while also providing theoretical guarantees and proven asymptotic optimality under suitable conditions. Section~4.4.2 therefore provides a direct comparison between HRF and a closely related method with a strong theoretical foundation. Moreover, to avoid selecting datasets that might favor HRF, we conduct the comparison on the datasets used by the authors of the competing method themselves. HRF outperforms the competing method on every dataset in this comparison.
+
+We view this as an important part of the empirical evidence for HRF, rather than primarily as a discussion of the limitations or reproducibility of the competing method. In particular, the results illustrate that theoretical optimality need not translate into superior finite-sample predictive performance, which is the principal criterion by which we evaluate HRF in this paper. For these reasons, we have retained the comparison in the main text while reducing the emphasis on the reproducibility issues.
+
+
+
+% -----------------------------------------------------------
+\subsection*{Comment 6}
+% -----------------------------------------------------------
+
+\comment{Page 2, line 43: the sentence is unclear and very long.}
+
+\response
+Thank you for this comment, we have rewritten the introduction to avoid run on sentences.
+
+% -----------------------------------------------------------
+\subsection*{Comment 7}
+% -----------------------------------------------------------
+
+\comment{Page 3, line 6: wording ``In contrast, ... makes do with the
+collection ...'' is unclear.}
+
+\response
+We have clarified this sentence, which now reads ``In contrast, the random forest requires no modeling choices apart from the selection of the set of regressors."
+
+% ============================================================
+\bibliographystyle{apalike}
+\bibliography{wolf}
+% ============================================================
+
+\end{document}

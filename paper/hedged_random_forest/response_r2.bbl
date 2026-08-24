@@ -1,0 +1,15 @@
+\begin{thebibliography}{1}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Friedman(1991)]{friedman:1991}
+Jerome~H. Friedman.
+\newblock Multivariate adaptive regression splines.
+\newblock \emph{Annals of Statistics}, 19\penalty0 (1):\penalty0 1--67, 1991.
+\newblock \doi{10.1214/aos/1176347963}.
+\newblock URL \url{https://doi.org/10.1214/aos/1176347963}.
+
+\end{thebibliography}

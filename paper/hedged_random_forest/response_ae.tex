@@ -1,0 +1,224 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{xr}
+\externaldocument{hrf}
+
+% Referee comment box
+\newmdenv[
+  linecolor=gray!50,
+  backgroundcolor=gray!8,
+  innerleftmargin=10pt,
+  innerrightmargin=10pt,
+  innertopmargin=8pt,
+  innerbottommargin=8pt,
+  skipabove=10pt,
+  skipbelow=4pt
+]{refbox}
+
+\newcommand{\comment}[1]{\begin{refbox}\itshape #1\end{refbox}}
+\newcommand{\response}{\medskip\noindent\textbf{Response.}\ }
+\newcommand{\hrf}{\textsc{hrf}}
+\newcommand{\rf}{\textsc{rf}}
+\newcommand{\todo}[1]{\par\medskip\noindent\fcolorbox{red}{red!8}{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{\textbf{\color{red}TODO (internal --- remove before submission):}\ \color{red}#1}}\par}
+
+\title{Response to the Associate Editor\\[6pt]
+  \large ``The Hedged Random Forest''\\
+  \normalsize Journal of Financial Econometrics --- JFEC-2025-167}
+\author{E.\ Beck \and D.\ Kozbur \and M.\ Wolf}
+\date{}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+We thank the Associate Editor for the encouraging assessment of the paper's
+potential and for the constructive guidance on how to strengthen it. Below we
+address each of the three points in turn. All section, table, and figure
+references are to the revised manuscript.
+
+% ============================================================
+\section*{Comment 1: A financial-econometric application}
+% ============================================================
+
+\comment{The empirical section would benefit from a closer match with the
+readership and standards of Journal of Financial Econometrics. The current
+evidence is useful in showing that the proposed hedged random forest improves
+upon the standard random forest and several weighted-random-forest variants
+on benchmark regression datasets. However, it does not yet fully demonstrate
+how the method performs in a financial-econometric setting. I would
+encourage the authors to add one substantive financial-econometric
+application, such as return prediction, volatility or realized-volatility
+forecasting, option-implied volatility forecasting, credit-risk prediction,
+macro-financial forecasting, or risk-premium estimation. The application
+should be framed as a genuine out-of-sample forecasting exercise, with
+rolling or expanding-window evaluation where appropriate. At the same time,
+I do not think the paper needs to become a broad horse-race comparison
+against all modern tree-based algorithms.}
+
+\response
+We have added a new application, Section~\ref{sec:fredmd}, that directly
+addresses this comment. Rather than a single hand-picked series, we forecast
+a broad panel of 41 target series drawn from two groups of the FRED-MD
+database \citep{mccracken:ng:2016}: interest-rate levels, credit and term
+spreads, and exchange rates (the \emph{Interest and Exchange Rates} group),
+and price indices (the \emph{Prices} group). Scanning across an entire class
+of targets, rather than reporting a single series, was a deliberate choice:
+it lets us show \emph{where} the hedging mechanism helps within a coherent
+financial-econometric setting, without turning the exercise into a
+horse-race across competing algorithms, which you correctly note the paper
+does not need.
+
+The exercise is a genuine expanding out-of-sample forecasting exercise in
+the sense you describe: for each target and each of 432 monthly origins
+(1990-05 through 2026-04), we fit the random forest (and \hrf) on a rolling
+360-month window, forecast the next month, and record the realized forecast
+error. We adapt the time-series estimators of $\hat\mu$ and $\hat\Sigma$
+developed in our companion paper on inflation forecasting
+\citep{beck:wolf:hrf-inf} (EWMA estimation combined with linear shrinkage)
+rather than the off-the-shelf estimators used for the i.i.d.\ benchmark
+datasets in Section~\ref{sec:results}, since --- as we discuss in
+Section~\ref{sec:fredmd} --- suitable estimators of the two hedging inputs
+depend on the nature and frequency of the data for time-series applications.
+
+Table~\ref{table:fredmd-summary} and Figure~\ref{fig:fredmd-boxplot}
+summarize the results by group, with the full 41-series breakdown in
+Appendix~B, Table~13. Across all 41 series, \hrf\ achieves a lower RMSE than
+\rf\ for 32 series (78\%), with a mean RMSE ratio of 0.982. The gains are
+strongest and most uniform for the eight credit and term spreads (\hrf\
+wins for every single series, mean ratio 0.938), more modest for the price
+indices (mean ratio 0.991), mixed for interest-rate levels (mean ratio
+0.995, concentrated at the short end of the curve), and essentially absent
+for exchange rates (mean ratio 1.000), consistent with the well-documented
+difficulty of beating a random walk in exchange-rate forecasting. This
+last point is itself informative: it shows that \hrf\ does not manufacture
+spurious gains where none should be expected.
+
+% ============================================================
+\section*{Comment 2: Incremental value relative to modern tree-based methods}
+% ============================================================
+
+\comment{Refining the contribution is important because unequal and signed
+contributions of trees are already familiar in boosted-tree methods. The
+authors should therefore show whether HRF offers incremental value relative
+to modern tree-based machine-learning tools, or clarify that its
+contribution is instead a low-tuning post-estimation improvement to random
+forests. A carefully designed financial-econometric application, together
+with some diagnostic evidence on when the weighting scheme works, would
+make the empirical contribution considerably more convincing.}
+
+\response
+We take the second of the two options you outline: we clarify, rather than
+attempt to out-perform, boosted-tree methods, for the following reason.
+Gradient boosting \citep{friedman:2001} and its variants construct an
+entirely different ensemble than the random forest: trees are fit
+sequentially to the residuals of the current ensemble, and performance
+typically depends on the joint tuning of several hyperparameters (the
+learning rate, tree depth, number of boosting rounds, and regularization).
+\hrf, by contrast, is a \emph{post-estimation} re-weighting of an
+already-trained, standard random forest. It requires no change to how the
+individual trees are grown and no retraining, and it has a single
+user-facing hyperparameter, the leverage constraint $\kappa$, for which we
+recommend --- and use throughout the paper, including in the new
+Section~\ref{sec:fredmd} --- the default choice $\kappa = 2$ (see
+Section~\ref{sec:hrf}). We therefore view \hrf\ as a low-tuning,
+``point-and-shoot'' improvement (this is literally how we describe the
+i.i.d.\ estimators in Section~\ref{sec:fredmd}) that a random-forest user
+can apply on top of an existing forest, rather than as a competitor to
+boosting-type ensembles built from the ground up. We agree that a direct
+horse-race against boosting would be a natural and interesting extension,
+but, per your own comment above, we have deliberately kept the paper's
+empirical scope to \hrf\ versus \rf\ and previously proposed weighted
+random forests, rather than broadening it into a comparison against all
+modern tree-based algorithms. This is a deliberate scoping strategy on our
+part, not an oversight: \hrf\ is positioned throughout the paper as a
+post-estimation refinement of a standard random forest, and we view a fair,
+properly tuned comparison against boosted-tree methods as a separate
+undertaking that deserves its own paper rather than a section here.
+
+\todo{We are about to tell the AE that we will \emph{not} run a
+head-to-head comparison against boosting or other modern tree ensembles in
+this paper --- framing \hrf\ purely as a post-estimation add-on and pushing
+a boosting comparison to future work. This is a real strategic commitment,
+and it isn't settled on our end yet: we should all agree before this goes
+out. If we'd rather leave the door open (e.g.\ a referee could ask for this
+in a later round, or we may want it for a follow-up paper), let's discuss
+before submitting.}
+
+On the diagnostic evidence you request: the FRED-MD results just described
+already provide one clear pattern. The gains from \hrf\ are largest and
+most uniform for the credit and term spreads, a group in which the
+underlying predictors (default risk, liquidity conditions, and the level of
+rates) are heterogeneous and only loosely related, plausibly giving rise to
+correspondingly heterogeneous, less mutually redundant tree forecasts for
+\hrf\ to exploit; the gains are essentially absent for exchange rates, which
+are close to unpredictable by any method. A second, independent piece of
+diagnostic evidence was reported in our response to Reviewer 1 (Additional
+Comment 1): across the 17 i.i.d.\ benchmark datasets of
+Section~\ref{sec:results}, the dispersion in individual trees' out-of-bag
+accuracy is the one dataset characteristic (of five considered) that is
+significantly related to \hrf's performance gain (Spearman $\rho = -0.72$,
+$p = 0.002$), with datasets with the most heterogeneous trees showing the
+largest gains. Both pieces of evidence point in the same direction: \hrf\
+helps most when trees are not all equally reliable, which is exactly the
+situation its weighting scheme is designed to exploit.
+
+% ============================================================
+\section*{Comment 3: Similarity score and prior circulation}
+% ============================================================
+
+\comment{Lastly, the similarity check reports a similarity score of 42\%,
+which has raised some concern at the editorial office. Having reviewed the
+report, I understand that much of the overlap appears to be with an earlier
+working-paper version of the same project. The authors would benefit from
+further revising the writing, presentation, and framing of the manuscript
+so that the submitted version is more clearly differentiated from the
+earlier version, while ensuring that any prior circulation is properly
+acknowledged.}
+
+\response
+You are correct: an earlier version of this paper circulated under the same
+title as a working paper, \citet{beck:kozbur:wolf:2024}. This JFEC
+submission is the first formal journal submission of that project; the
+working paper itself was never submitted elsewhere. We had not yet added an
+explicit acknowledgment of the prior circulation to the manuscript and are
+glad to add a title-page footnote citing the working paper if the editorial
+office considers this necessary --- we did not want to make further changes
+to the main text before confirming the exact wording and placement you and
+the editorial office would prefer.
+
+On differentiation from the working paper: relative to that version, the
+manuscript has been substantially revised, both in response to Reviewer~1
+and in response to this letter. Reviewer~1's comments led us to add two
+additional benchmark comparisons not present in the working paper --- a
+ridge combination scheme and a bias-free minimum-variance variant,
+HRF-MinVar (Section~\ref{sec:comp1}) --- a discussion of negative weights
+in relation to tree correlations (Section~\ref{sec:neg-weights}), a remark
+clarifying that the leverage constraint yields dense rather than sparse
+solutions (Remark~\ref*{rem:dense}), and a unification of notation
+throughout the paper around the shrinkage/sample $\times$ $\kappa \in
+\{1,2\}$ labeling scheme. This letter adds a further, substantial change:
+the new financial-econometric application of Section~\ref{sec:fredmd},
+which has no counterpart in the working paper. Between the two rounds of
+revision, a large share of the paper's empirical content and exposition is
+new relative to the circulated working paper, and we would welcome any
+further guidance from the editorial office on presentation changes that
+would help differentiate the two versions.
+
+% ============================================================
+\bibliographystyle{plainnat}
+\bibliography{wolf}
+% ============================================================
+
+\end{document}

@@ -105,7 +105,14 @@ print(combined[, c("dataset_name", "avg_abs_cor", "tree_quality_cv")], digits = 
 cat("\n--- Spearman correlations with HRF/RF performance gain ---\n")
 predictors_to_test <- c("avg_abs_cor", "tree_quality_cv", "kurtosis_target", "p", "n_over_p")
 cor_table <- data.frame(characteristic = predictors_to_test)
-cor_table$spearman_rho <- sapply(predictors_to_test, function(ch) {
-  cor(combined[[ch]], combined$hrf_rf_gain_avg, method = "spearman")
+# Two-sided test of rho = 0; exact except where tied values (e.g. p, the
+# number of features) force cor.test to fall back on the asymptotic
+# t-approximation.
+cor_tests <- lapply(predictors_to_test, function(ch) {
+  suppressWarnings(cor.test(
+    combined[[ch]], combined$hrf_rf_gain_avg, method = "spearman"
+  ))
 })
+cor_table$spearman_rho <- vapply(cor_tests, function(ct) unname(ct$estimate), numeric(1))
+cor_table$p_value <- vapply(cor_tests, function(ct) ct$p.value, numeric(1))
 print(cor_table, digits = 3)

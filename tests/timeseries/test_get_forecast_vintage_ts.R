@@ -29,10 +29,11 @@ for (tcode in c(1, 2, 6)) {
     window_length = window_length, num_trees = 50
   )
   stopifnot(nrow(result) == length(horizons))
-  stopifnot(all(c("horizon", "rf_forecast", "hrf_forecast", "actual") %in% colnames(result)))
+  stopifnot(all(c("horizon", "rf_forecast", "hrf_forecast", "hrf_minvar_forecast", "actual") %in% colnames(result)))
   stopifnot(identical(result$horizon, horizons))
   stopifnot(all(is.finite(result$rf_forecast)))
   stopifnot(all(is.finite(result$hrf_forecast)))
+  stopifnot(all(is.finite(result$hrf_minvar_forecast)))
   ## actual should match target_raw[origin_idx + horizon] exactly
   stopifnot(all.equal(result$actual, target_raw[origin_idx + horizons]))
   cat("tcode", tcode, "OK\n")
